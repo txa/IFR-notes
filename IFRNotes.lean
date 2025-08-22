@@ -1,9 +1,9 @@
 import VersoManual
-import Content.Meta.Lean
+--import Content.Meta.Lean
 open Verso.Genre Manual
 open Verso.Genre.Manual.InlineLean
 
-open Content
+--open Content
 set_option pp.rawOnError true
 
 
@@ -13,4 +13,4 @@ set_option pp.rawOnError true
 authors := ["Thorsten Altenkirch"]
 %%%
 
-include Intro
+include Content.Intro
