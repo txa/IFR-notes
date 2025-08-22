@@ -1,0 +1,16 @@
+.lake/
+build/
+_out/
+lake-packages/
+lean_packages/
+.olean/
+.lean_cache/
+.DS_Store
+.AppleDouble
+._*
+.vscode/
+.idea/
+*.swp
+*.swo
+*.log
+# docs/
