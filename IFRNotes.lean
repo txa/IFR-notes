@@ -1,6 +1,6 @@
 import VersoManual
 
---import Content.Intro
+import Content.Intro
 
 --import Content.Meta.Lean
 open Verso.Genre Manual
