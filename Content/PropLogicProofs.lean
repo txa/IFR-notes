@@ -25,3 +25,11 @@ theorem swap : (P → Q → R) → (Q → P → R) := by
   exact p
   exact q
 -- ANCHOR_END: ExampleSwap
+
+-- ANCHOR: PrintI
+#print I
+-- ANCHOR_END: PrintI
+
+-- ANCHOR: PrintC
+#print C
+-- ANCHOR_END: PrintC

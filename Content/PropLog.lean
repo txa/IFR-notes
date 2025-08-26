@@ -221,3 +221,9 @@ p : P
 ```
 
 which we can quickly eliminate using `exact q`.
+
+#Proof terms
+
+What is a proof? It looks like a proof in Lean is a sequence of tactics. But this is only the surface: the tactics are more like editor commands which *generate* the real proof, which is a *program*. This also explains the syntax `p : P`, reminiscent of the notation for typing `3 :: Int` in Haskell (that Haskell uses `::` instead of `:` is a regrettable historic accident).
+
+We can look at the programs generated from proofs by using the `#print` command in Lean. For example:
