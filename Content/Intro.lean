@@ -1,27 +1,29 @@
 import VersoManual
---import Content.Meta.Lean
+import Content.Meta
 open Verso.Genre Manual
 open Verso.Genre.Manual.InlineLean
+open Verso.Code.External
 
---open Content
---set_option pp.rawOnError true
-
---set_option verso.exampleProject "../examples"
---set_option verso.exampleModule "HelloName"
-
--- ```anchor example1
-
--- ```
-
+set_option verso.exampleProject "."
+set_option verso.exampleModule "Content.PropLogicProofs"
 
 #doc (Manual) "Introduction" =>
-
+%%%
+tag := "intro"
+%%%
 These are lecture notes for COMP2065: Introduction to formal
 reasoning. The main goal is to teach
 formal logic using an interactive proof system called *Lean*. You will be
 able to use predicate logic to make precise statements and to verify
 them using a proof system. The covers both statements in Mathematics
 and statements about computer programs, e.g. their correctness.
-```lean
-#eval 2 + 2
+```anchor CheckImpl
+#check P → Q
+```
+```anchorInfo CheckImpl
+P → Q : Prop
+```
+
+```comment
+Also anchorWarning and AnchorError
 ```

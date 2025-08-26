@@ -1,21 +1,18 @@
 import VersoManual
+import Content.Meta
+
 open Verso.Genre Manual
 open Verso.Genre.Manual.InlineLean
+open Verso.Code.External
 
---open Content
---set_option pp.rawOnError true
-
---set_option verso.exampleProject "../examples"
---set_option verso.exampleModule "HelloName"
-
--- ```anchor example1
-
--- ```
-
+set_option verso.exampleProject "."
+set_option verso.exampleModule "Content.PropLogicProofs"
 
 #doc (Manual) "Propositional Logic" =>
 
 # What is a proposition?
+
+See {ref "intro"}[The Introduction]
 
 A proposition is a definitive statement which we may be able to
 prove. In Lean we write `P : Prop` to express that `P` is a
@@ -24,11 +21,11 @@ proposition.
 We will later introduce ways to construct interesting propositions
 i.e. mathematical statements or statements about programs, but in the moment
 we will use propositional variables instead. We declare in Lean:
-```lean
+```anchor Vars
 variable (P Q R : Prop)
 ```
 
-This means that  `P Q R` are propositional variables which may
+This means that  {anchorTerm Vars}`P Q R` are propositional variables which may
 be substituted by any concrete propositions. In the moment it is helpful to think of them as statements
 like "The sun is shining" or "We go to the zoo."
 
@@ -83,7 +80,8 @@ We start with a very simple tautology `P → P`: If `P` then `P`. We can illustr
 
 Here is how we prove it in Lean:
 
-```lean
+with anchor
+```anchor ExampleI
 theorem I : P → P := by
   intro h
   exact h

@@ -19,7 +19,7 @@ def config : Config where
   emitTeX := false
   emitHtmlSingle := false
   emitHtmlMulti := true
-  htmlDepth := 2
+  htmlDepth := 1
 
 --def main := manualMain (%doc IFRNotes) (extraSteps := [buildExercises]) (config := config)
 def main := manualMain (%doc IFRNotes) (config := config)
