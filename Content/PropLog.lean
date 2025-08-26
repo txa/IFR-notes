@@ -91,7 +91,7 @@ is just two lines, which invoke *tactics*:
 
 * `intro h` means that we are going to prove an implication by assuming the premise (the left hand side) and using this assumption to prove
   the conclusion (the right hand side). If you look at the html version of this document you
-  can view the proof state by hovering over the end of a line.
+  can view the proof state by hovering over the bubble at the end of a line.
  When you move the cursor after `by` you see that the proof state is:
 ```
     P : Prop
@@ -248,3 +248,94 @@ If you have studied functional programming (e.g. *Haskell*) you should have a *d
 Not all Haskell programs correspond to proofs; in particular, general recursion is not permitted in proofs, only certain forms of recursion that always terminate. Also, the Haskell type system isn't expressive enough to be used in a system like Lean: it is fine for propositional logic, but it doesn't cover predicate logic, which we will introduce soon. The functional language on which Lean relies is called *dependent type theory* — more specifically, the *Calculus of Inductive Constructions*.
 
 Type theory is an interesting subject, but we won't be able to say much in this course. If you want to learn more about this, you can attend *Proofs, Programs and Types* (COMP4074), which can also be done in year 3.
+
+# Conjunction
+
+How to prove a conjunction? Easy! To prove `P ∧ Q` we need to prove both `P` and `Q`. This is achieved via the `constructor` tactic. Here is a simple example (and since I don't want to give it a name, I am using `example` instead of `theorem`).
+
+```anchor ExampleAndI
+example : P → Q → P ∧ Q := by
+  intro p q
+  constructor
+  exact p
+  exact q
+```
+`constructor` turns the goal:
+
+```
+P Q : Prop
+p : P
+q : Q
+⊢ P ∧ Q
+```
+
+into two goals:
+
+```
+2 goals
+P Q : Prop
+p : P
+q : Q
+⊢ P
+
+P Q : Prop
+p : P
+q : Q
+⊢ Q
+```
+
+Now what is your next question? Exactly! How do we use a conjunction in an assumption? Here is an example: we show that `∧` is *commutative*.
+
+```anchor ExampleComAnd
+theorem comAnd : P ∧ Q → Q ∧ P := by
+  intro pq
+  cases pq with
+  | intro p q =>
+    constructor
+    exact q
+    exact p
+```
+
+After `intro pq` we are in the following state:
+
+```
+P Q : Prop
+pq : P ∧ Q
+⊢ Q ∧ P
+```
+
+Assuming `P ∧ Q` is the same as assuming both `P` and `Q`. This is facilitated via the `cases` tactic which matches how a conjuction was created (and we learn the the *constructor* for `∧` is called `intro`). Hence after
+```
+cases pq with
+  | intro p q =>
+```
+the state is
+```
+P Q : Prop
+p : P
+q : Q
+⊢ Q ∧ P
+```
+The name `cases` seems to be a bit misleading since there is only one case to consider here. However, as we will see, `cases` is applicable more generally in situations where the name is better justified. nd yes this is just pattern matching as you may have seen already in Hskell.
+
+I hope you notice the same symmetry between tactics for *how to prove* and *how to use* which we have seen for implication also shows for conjunction. This pattern is going to continue.
+
+It is good to know that Lean always abstracts the propositional variables we have declared. We can actually use `comAnd` with different instantiation to prove the following:
+
+```anchor ExampleComAndIff
+theorem comAndIff : P ∧ Q ↔ Q ∧ P := by
+  constructor
+  apply comAnd
+  apply comAnd
+```
+
+Why is the first step `constructor`? Because as we said before
+
+>  We define `P ↔ Q` as `(P → Q) ∧ (Q → P)`.
+
+(actually this is only approximately true but good enough at our current stage.)
+
+In the second use of `comAnd` we instantiate `Q` with `P` and `P` with `Q`. Lean can usually infer these instantiations automatically from the goal, but in more complicated situations it may need a hint. We can write:
+```
+apply (comAnd (P:=Q) (Q:=P))
+```

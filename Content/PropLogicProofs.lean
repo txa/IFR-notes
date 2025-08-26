@@ -41,3 +41,20 @@ example : P → Q → P ∧ Q := by
   exact p
   exact q
 -- ANCHOR_END: ExampleAndI
+
+-- ANCHOR: ExampleComAnd
+theorem comAnd : P ∧ Q → Q ∧ P := by
+  intro pq
+  cases pq with
+  | intro p q =>
+    constructor
+    exact q
+    exact p
+-- ANCHOR_END: ExampleComAnd
+
+-- ANCHOR: ExampleComAndIff
+theorem comAndIff : P ∧ Q ↔ Q ∧ P := by
+  constructor
+  apply comAnd
+  apply comAnd
+-- ANCHOR_END: ExampleComAndIff
