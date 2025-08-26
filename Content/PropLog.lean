@@ -222,8 +222,29 @@ p : P
 
 which we can quickly eliminate using `exact q`.
 
-#Proof terms
+# Proof terms
 
 What is a proof? It looks like a proof in Lean is a sequence of tactics. But this is only the surface: the tactics are more like editor commands which *generate* the real proof, which is a *program*. This also explains the syntax `p : P`, reminiscent of the notation for typing `3 :: Int` in Haskell (that Haskell uses `::` instead of `:` is a regrettable historic accident).
 
 We can look at the programs generated from proofs by using the `#print` command in Lean. For example:
+```anchor PrintI
+#print I
+```
+```anchorInfo PrintI
+theorem I : ∀ (P : Prop), P → P :=
+fun P h => h
+```
+and
+```anchor PrintC
+#print C
+```
+```anchorInfo PrintC
+theorem C : ∀ (P Q R : Prop), (P → Q) → (Q → R) → P → R :=
+fun P Q R p2q q2r p => q2r (p2q p)
+```
+
+If you have studied functional programming (e.g. *Haskell*) you should have a *déjà vu*: indeed proofs are *functional programs*. Lean exploits the *propositions as types* translation (also known as the *Curry–Howard Equivalence*) and associates to every proposition the type of evidence for this proposition. This means that to see that a proposition holds all we need to do is to find a program in the type associated to it.
+
+Not all Haskell programs correspond to proofs; in particular, general recursion is not permitted in proofs, only certain forms of recursion that always terminate. Also, the Haskell type system isn't expressive enough to be used in a system like Lean: it is fine for propositional logic, but it doesn't cover predicate logic, which we will introduce soon. The functional language on which Lean relies is called *dependent type theory* — more specifically, the *Calculus of Inductive Constructions*.
+
+Type theory is an interesting subject, but we won't be able to say much in this course. If you want to learn more about this, you can attend *Proofs, Programs and Types* (COMP4074), which can also be done in year 3.

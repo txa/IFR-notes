@@ -33,3 +33,11 @@ theorem swap : (P → Q → R) → (Q → P → R) := by
 -- ANCHOR: PrintC
 #print C
 -- ANCHOR_END: PrintC
+
+-- ANCHOR: ExampleAndI
+example : P → Q → P ∧ Q := by
+  intro p q
+  constructor
+  exact p
+  exact q
+-- ANCHOR_END: ExampleAndI
