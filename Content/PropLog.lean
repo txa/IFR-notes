@@ -339,3 +339,189 @@ In the second use of `comAnd` we instantiate `Q` with `P` and `P` with `Q`. Lean
 ```
 apply (comAnd (P:=Q) (Q:=P))
 ```
+
+# The Currying Equivalence
+
+Maybe you have already noticed that a statement like `P → Q → R`
+basically means that `R` can be proved from assuming both `P` and `Q`.
+Indeed, it is equivalent to `P ∧ Q → R`. We can show this formally by using
+`↔`.
+
+All the steps we have already explained, so we won't comment further here. It is a
+good idea to step through the proof (by hovering over the bubbles) or by using Lean.
+```anchor ExampleCurry
+theorem curry : P ∧ Q → R ↔ P → Q → R := by
+  constructor
+  · intro pqr p q
+    apply pqr
+    constructor
+    · exact p
+    · exact q
+  · intro pqr pq
+    cases pq with
+    | intro p q =>
+      apply pqr
+      · exact p
+      · exact q
+```
+I call this the currying equivalence, because this is the logical counterpart of currying in functional programming: that a function with several parameters can be reduced to a function which returns a function. For example, in Haskell addition has the type `Int -> Int -> Int` instead of `(Int, Int) -> Int`.
+
+# Disjunction
+
+To prove a disjunction `P ∨ Q` we can either prove `P` or we can prove `Q`. This is achieved via the appropriately named tactics `left` and `right`. Here are some simple examples:
+```anchor ExamplesOr
+example : P → P ∨ Q := by
+  intro p
+  left
+  exact p
+
+example : Q → P ∨ Q := by
+  intro q
+  right
+  exact q
+```
+To use a disjunction `P ∨ Q` we have to show that the current goal
+follows both from assuming `P` and from assuming `Q`. To achieve
+this we use `cases` again, and this time the name actually
+makes sense. Here is an example:
+```anchor ExampleCaseLem
+theorem caseLem : (P → R) → (Q → R) → P ∨ Q → R := by
+  intro p2r q2r pq
+  cases pq with
+  | inl p =>
+    apply p2r
+    exact p
+  | inr q =>
+    apply q2r
+    exact q
+```
+After `intro` we are in the following state:
+
+```
+P Q R : Prop
+p2r : P → R
+q2r : Q → R
+pq : P ∨ Q
+⊢ R
+```
+
+We use
+```
+cases pq with
+| inl p => …
+| inr q => …
+```
+which means that we are going to use the assumption `P ∨ Q`.
+There are two cases to consider, one for `P` and one for `Q`, resulting in two subgoals.
+We indicate which names we want to use for the assumptions in each case, namely `p` and `q`:
+
+```
+2 goals
+case Or.inl
+P Q R : Prop
+p2r : P → R
+q2r : Q → R
+p : P
+⊢ R
+
+case Or.inr
+P Q R : Prop
+p2r : P → R
+q2r : Q → R
+q : Q
+⊢ R
+```
+
+To summarise: there are two ways to prove a disjunction using `left`
+and `right`. To *use* a disjunction in an assumption we use `cases` to
+perform a case analysis and show that the current goal follows from
+either of the two components.
+
+# Logic and algebra
+
+As an example which involves both conjunction and disjunction we prove
+distributivity. In algebra we know the law
+`x(y+z) = xy + xz`; a
+similar law holds in propositional logic:
+```
+example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
+  sorry
+```
+Sorry, but I was too lazy to do the proof so I left it to you. In
+Lean you can say `sorry` and omit the proof. This is an easy way
+out if you cannot complete your Lean homework: you just type
+`sorry` and it is fine. However, then I will say *Sorry but you
+don't get any points for this.*
+
+The correspondence with algebra goes further: the counterpart to
+implication is exponentiation but you have to read it backwards, that
+is `P → Q` becomes `Q^P`. Then the translation of the law
+`x^{yz} = (x^y)^z` corresponds to the currying equivalence
+`P ∧ Q → R ↔ P → Q → R`.
+
+Maybe you remember that there is another law of exponentiation
+`x^{y+z} = x^y x^z`. And indeed its translation is also a law
+of logic:
+```
+theorem caseThm : P ∨ Q → R ↔ (P → R) ∧ (Q → R) := by
+  sorry
+```
+# True, false and negation
+
+There are two logical constants `True` and `False`. It is a bit awkward to translate them into everyday English, so we think of `True` as something obviously true (e.g. *It sometimes rains in England*) and `False` as something obviously false (e.g. *Pigs can fly*).
+
+As far as logic and proof are concerned, `True` behaves like an empty conjunction and `False` like an empty disjunction. Hence it is easy to prove `True`:
+```anchor ExampleTrue
+example : True := by
+  constructor
+```
+While in the case of `∧` we were left with two subgoals, here we are left with none—we are already done.
+
+Symmetrically, there is no way to prove `False` (there is neither `left` nor `right`, and that's good!). On the other hand, doing cases on `False` as an assumption makes the current goal go away “by magic” and leaves no goals to be proven:
+```anchor ExampleFalse
+theorem efq : False → P := by
+  intro pigs_can_fly
+  cases pigs_can_fly
+```
+`efq` is short for the Latin phrase *Ex falso quodlibet* — “from falsehood, anything follows.” This can feel odd in everyday reasoning, but in formal logic the inference “If pigs can fly then I am the president of America” is valid.
+
+We define `¬ P` as `P → False`, which means that `P` is impossible. If someone says *If we get married then pigs can fly*, that means *no*.
+
+As an example, we can prove the law of non-contradiction: it cannot be that both `P` and `¬ P` hold.
+```anchor ExampleContr
+theorem contr : ¬ (P ∧ ¬ P) := by
+  intro pnp
+  cases pnp with
+  | intro p np =>
+    apply np
+    exact p
+```
+# Summary of tactics
+
+Below is a table summarising the tactics we have seen so far (Lean 4 syntax):
+
+|           | How to prove?      | How to use?                                      |
+|-----------|--------------------|--------------------------------------------------|
+| `→`       | `intro h`          | `apply h`                                        |
+| `∧`       | `constructor`      | `cases h with \| intro p q => …`                |
+| `∨`       | `left` / `right`   | `cases h with \| inl p => … \| inr q => …`     |
+| `True`    | `constructor`      | —                                                |
+| `False`   | —                  | `cases h`                                        |
+
+These correspond to the introduction and elimination rules in *natural deduction*, a system devised by the German logician Gerhard Gentzen.
+
+![Gerhard Gentzen (1909–1945)](/Content/gentzen.jpeg)
+
+The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is different. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
+
+You can omit explicit names and just write `cases h`; Lean will generate names for you. However, for homework and clarity, it is better to provide names.
+
+We also have `exact h`, which is a structural tactic that doesn't fit the scheme above (and more generally `exact t` for any proof term `t`). There is also `assumption`, which checks whether any assumption matches the current goal. Thus we could have written the first proof as:
+
+```anchor ExampleAss
+example : P → P := by
+  intro h
+  assumption
+```
+
+*Important.* There are many more tactics available in Lean, some with a higher degree of automation, and some tactics can be used in ways we have not discussed here. When solving exercises, please use only the tactics we have introduced and only in the ways we have described.

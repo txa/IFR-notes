@@ -58,3 +58,74 @@ theorem comAndIff : P ∧ Q ↔ Q ∧ P := by
   apply comAnd
   apply comAnd
 -- ANCHOR_END: ExampleComAndIff
+
+-- ANCHOR: ExampleCurry
+theorem curry : P ∧ Q → R ↔ P → Q → R := by
+  constructor
+  · intro pqr p q
+    apply pqr
+    constructor
+    · exact p
+    · exact q
+  · intro pqr pq
+    cases pq with
+    | intro p q =>
+      apply pqr
+      · exact p
+      · exact q
+-- ANCHOR_END: ExampleCurry
+
+-- ANCHOR: ExamplesOr
+example : P → P ∨ Q := by
+  intro p
+  left
+  exact p
+
+example : Q → P ∨ Q := by
+  intro q
+  right
+  exact q
+-- ANCHOR_END: ExamplesOr
+
+-- ANCHOR: ExampleCaseLem
+theorem caseLem : (P → R) → (Q → R) → P ∨ Q → R := by
+  intro p2r q2r pq
+  cases pq with
+  | inl p =>
+    apply p2r
+    exact p
+  | inr q =>
+    apply q2r
+    exact q
+-- ANCHOR_END: ExampleCaseLem
+
+-- ANCHOR: ExampleDistr
+-- example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
+--   sorry
+-- ANCHOR_END: ExampleDistr
+
+-- ANCHOR: ExampleTrue
+example : True := by
+  constructor
+-- ANCHOR_END: ExampleTrue
+
+-- ANCHOR: ExampleFalse
+theorem efq : False → P := by
+  intro pigs_can_fly
+  cases pigs_can_fly
+-- ANCHOR_END: ExampleFalse
+
+-- ANCHOR: ExampleContr
+theorem contr : ¬ (P ∧ ¬ P) := by
+  intro pnp
+  cases pnp with
+  | intro p np =>
+    apply np
+    exact p
+-- ANCHOR_END: ExampleContr
+
+-- ANCHOR: ExampleAss
+example : P → P := by
+  intro h
+  assumption
+-- ANCHOR_END: ExampleAss
