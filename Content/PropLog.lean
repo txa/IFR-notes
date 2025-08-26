@@ -80,7 +80,6 @@ We start with a very simple tautology `P → P`: If `P` then `P`. We can illustr
 
 Here is how we prove it in Lean:
 
-with anchor
 ```anchor ExampleI
 theorem I : P → P := by
   intro h
@@ -91,5 +90,134 @@ grandiose a name for this) named `I` (for identity). The actual proof
 is just two lines, which invoke *tactics*:
 
 * `intro h` means that we are going to prove an implication by assuming the premise (the left hand side) and using this assumption to prove
-  the conclusion (the right hand side). If you look at the html version of this document you can click on *Try it* to open lean in a separate
-  window.  When you move the cursor before `assume h` you see that the proof state is:
+  the conclusion (the right hand side). If you look at the html version of this document you
+  can view the proof state by hovering over the end of a line.
+ When you move the cursor after `by` you see that the proof state is:
+```
+    P : Prop
+    ⊢ P → P
+```
+  This means we assume that `P` is a proposition and want to prove `P → P`. The `⊢` symbol (pronounced *turnstile*) separates the assumptions and the goal. After
+  `intro h` the proof state is:
+```
+    P : Prop,
+    h : P
+    ⊢ P
+```
+  This means our goal is now `P` but we have an additional assumption `h : P`.
+* `exact h` We complete the proof by telling Lean that there is an assumption that *exactly* matches the current goal. If you move the cursor yo the emd pf the line  you see `All goals completed`. We are done.
+
+# Using assumptions
+Next we are going to prove another tautology: `(P → Q) → (Q → R) → P → R`.
+Here is a translation into English:
+
+*If if the sun shines then we go to the zoo then if if we go to the zoo then we are happy then if the sun shines then we are happy.*
+
+Maybe this already shows why it is better to use formulas to write propositions.
+
+Here is the proof in Lean (I call it `C` for *compose*).
+```anchor ExampleC
+theorem C : (P → Q) → (Q → R) → P → R := by
+  intro p2q
+  intro q2r
+  intro p
+  apply q2r
+  apply p2q
+  exact p
+```
+First of all it is useful to remember that `→` associates to the right; putting in the invisible brackets this corresponds to:
+```
+  (P → Q) → ((Q → R) → (P → R))
+```
+After the three `intro` we are in the following state::
+```
+  P Q R : Prop,
+  p2q : P → Q,
+  q2r : Q → R,
+  p : P
+  ⊢ R
+```
+Now we have to *use* an implication. Clearly it is `q2r` which can be of any help because it promises to show `R` given `Q`. Hence once we say `apply q2r` we are left to show `Q`:
+```
+  P Q R : Prop,
+  p2q : P → Q,
+  q2r : Q → R,
+  p : P
+  ⊢ Q
+```
+
+After the three `intro` we are in the following state:
+
+```
+P Q R : Prop
+p2q : P → Q
+q2r : Q → R
+p : P
+⊢ R
+```
+
+Now we have to *use* an implication. Clearly it is `q2r` which can be of any help because it promises to show `R` given `Q`. Hence once we say `apply q2r` we are left to show `Q`:
+
+```
+P Q R : Prop
+p2q : P → Q
+q2r : Q → R
+p : P
+⊢ Q
+```
+
+The next step is to use `apply p2q` to reduce the goal to `P`, which can be shown using `exact p`.
+
+Note that there are two kinds of steps in these proofs:
+
+* `intro h` means that we are going to prove an implication `P → Q` by assuming `P` (and we call this assumption `h`) and then
+  proving `Q` with this assumption.
+* `apply h` if we have assumed an implication `h : P → Q` and our current goal matches the right hand side we can use this assumption to
+  *reduce* the problem to showing `P` (whether this is indeed a good idea depends on whether it is actually easier to show `P`).
+
+The `apply` tactic is a bit more general; it can also be used to handle repeated implications. Here is an example:
+```anchor ExampleSwap
+theorem swap : (P → Q → R) → (Q → P → R) := by
+  intro f q p
+  apply f
+  exact p
+  exact q
+```
+After `intro f q p` (which is a shortcut for writing `intro` three times) we are in the following state:
+
+```
+P Q R : Prop
+f : P → Q → R
+q : Q
+p : P
+⊢ R
+```
+
+Now we can use `f` because its conclusion matches our goal, but we are left with two goals:
+
+```
+2 goals
+P Q R : Prop
+f : P → Q → R
+q : Q
+p : P
+⊢ P
+
+P Q R : Prop
+f : P → Q → R
+q : Q
+p : P
+⊢ Q
+```
+
+After completing the first goal with `exact p` it disappears and only one goal is left:
+
+```
+P Q R : Prop
+f : P → Q → R
+q : Q
+p : P
+⊢ Q
+```
+
+which we can quickly eliminate using `exact q`.
