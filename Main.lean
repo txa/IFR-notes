@@ -13,9 +13,10 @@ open Verso.Genre Manual
 
 open Std (HashMap)
 
-open IFRNotes
+--open IFRNotes
 
 def config : Config where
+  extraFiles := [("./Content", "gentzen.jpeg")]
   emitTeX := false
   emitHtmlSingle := false
   emitHtmlMulti := true

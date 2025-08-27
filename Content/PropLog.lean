@@ -500,17 +500,26 @@ theorem contr : ¬ (P ∧ ¬ P) := by
 
 Below is a table summarising the tactics we have seen so far (Lean 4 syntax):
 
-|           | How to prove?      | How to use?                                      |
-|-----------|--------------------|--------------------------------------------------|
-| `→`       | `intro h`          | `apply h`                                        |
-| `∧`       | `constructor`      | `cases h with \| intro p q => …`                |
-| `∨`       | `left` / `right`   | `cases h with \| inl p => … \| inr q => …`     |
-| `True`    | `constructor`      | —                                                |
-| `False`   | —                  | `cases h`                                        |
+table goes here.
+
+:::table
+*
+  * \
+  * How to prove?
+  * How to use?
+*
+  * y
+  * Red
+  * `#ff0000`
+*
+  * z
+  * Green
+  * `#00ff00`
+:::
 
 These correspond to the introduction and elimination rules in *natural deduction*, a system devised by the German logician Gerhard Gentzen.
 
-![Gerhard Gentzen (1909–1945)](/Content/gentzen.jpeg)
+![Gerhard Gentzen (1909–1945)](./Content/gentzen.jpeg)
 
 The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is different. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
 
