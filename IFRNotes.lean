@@ -1,8 +1,10 @@
 import VersoManual
+import Content.Meta
 
-
+-- chapters
 import Content.Intro
 import Content.PropLog
+import Content.Classical
 
 open Content
 --import Content.Meta.Lean
@@ -18,11 +20,17 @@ set_option pp.rawOnError true
 authors := ["Thorsten Altenkirch"]
 %%%
 
-{index}[notes]
+
+```comment
+{index}[notes] {comment}[only for index]
 bla
 
 
 after
 
+commented out
+```
+
 {include 1 Intro}
 {include 1 PropLog}
+{include 1 Classical}

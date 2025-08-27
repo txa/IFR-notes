@@ -12,7 +12,9 @@ set_option verso.exampleModule "Content.PropLogicProofs"
 
 # What is a proposition?
 
+```comment
 See {ref "intro"}[The Introduction]
+```
 
 A proposition is a definitive statement which we may be able to
 prove. In Lean we write `P : Prop` to express that `P` is a
