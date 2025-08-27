@@ -16,7 +16,7 @@ open Std (HashMap)
 --open IFRNotes
 
 def config : Config where
-  extraFiles := [("./Content", "gentzen.jpeg")]
+  extraFiles := [("./Content/gentzen.jpeg", "gentzen.jpeg")]
   emitTeX := false
   emitHtmlSingle := false
   emitHtmlMulti := true
