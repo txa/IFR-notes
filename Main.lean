@@ -23,4 +23,5 @@ def config : Config where
   htmlDepth := 1
 
 --def main := manualMain (%doc IFRNotes) (extraSteps := [buildExercises]) (config := config)
-def main := manualMain (%doc IFRNotes) (config := config)
+--def main := manualMain (%doc IFRNotes) (config := config)
+def main := manualMain (%doc IFRNotes) (config := config.addKaTeX)

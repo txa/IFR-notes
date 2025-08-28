@@ -99,10 +99,10 @@ theorem caseLem : (P → R) → (Q → R) → P ∨ Q → R := by
     exact q
 -- ANCHOR_END: ExampleCaseLem
 
--- ANCHOR: ExampleDistr
--- example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
---   sorry
--- ANCHOR_END: ExampleDistr
+--ANCHOR: ExampleDistr
+example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
+  sorry
+--ANCHOR_END: ExampleDistr
 
 -- ANCHOR: ExampleTrue
 example : True := by
@@ -123,6 +123,19 @@ theorem contr : ¬ (P ∧ ¬ P) := by
     apply np
     exact p
 -- ANCHOR_END: ExampleContr
+
+-- ANCHOR: ExampleHave
+example : (P → Q ∨ Q) → (P → Q) := by
+  intro h p
+  have qorq : Q ∨ Q := by
+    apply h
+    exact p
+  cases qorq with
+  | inl q =>
+      exact q
+  | inr q =>
+      exact q
+-- ANCHOR_END: ExampleHave
 
 -- ANCHOR: ExampleAss
 example : P → P := by

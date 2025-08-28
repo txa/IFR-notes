@@ -498,11 +498,45 @@ theorem contr : ¬ (P ∧ ¬ P) := by
     apply np
     exact p
 ```
+# Use `have`
+
+There is one more useful tactic which is not related to any propositional connective. Let's say we want to prove
+```
+(P → Q ∨ Q) → (P → Q)
+```
+Now it is pretty easy to *cut* this proof by showing that `Q ∨ Q → Q` and then use this to show the result. But there is a better way which avoids introducing a new theorem and which is called `have`. This is best explained by an example:
+
+```anchor ExampleHave
+theorem contr : ¬ (P ∧ ¬ P) := by
+  intro pnp
+  cases pnp with
+  | intro p np =>
+    apply np
+    exact p
+```
+
+We introduce a new goal by saying
+```
+have qorq : Q ∨ Q := by
+```
+and now the proof state is
+```
+h : P → Q ∨ Q
+p : P
+⊢ Q ∨ Q
+```
+In the next lines we prove this and afterwards we can use `qorq`
+```
+h : P → Q ∨ Q
+p : P
+qorq : Q ∨ Q
+```
+
+So we use `have` to introduce intermediate goals. This is called a *cut*.
+
 # Summary of tactics
 
 Below is a table summarising the tactics we have seen so far (Lean 4 syntax):
-
-table goes here.
 
 :::table
 *
@@ -535,11 +569,12 @@ These correspond to the introduction and elimination rules in *natural deduction
 
 ![Gerhard Gentzen (1909–1945)](gentzen.jpeg)
 
+He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* ir the *Hauptsatz*).
+
 The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is different. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
 
-You can omit explicit names and just write `cases h`; Lean will generate names for you. However, for homework and clarity, it is better to provide names.
 
-We also have `exact h`, which is a structural tactic that doesn't fit the scheme above (and more generally `exact t` for any proof term `t`). There is also `assumption`, which checks whether any assumption matches the current goal. Thus we could have written the first proof as:
+We also have `exact h`, which is a structural tactic that doesn't fit the scheme above (and more generally `exact t` for any proof term `t`). Another structural tatcic is `have` for introducing intermediate goals. There is also `assumption`, which checks whether any assumption matches the current goal. Thus we could have written the first proof as:
 
 ```anchor ExampleAss
 example : P → P := by
@@ -548,3 +583,5 @@ example : P → P := by
 ```
 
 *Important.* There are many more tactics available in Lean, some with a higher degree of automation, and some tactics can be used in ways we have not discussed here. When solving exercises, please use only the tactics we have introduced and only in the ways we have described.
+
+Need to explain `have`!
