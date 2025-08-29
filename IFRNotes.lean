@@ -5,6 +5,7 @@ import Content.Meta
 import Content.Intro
 import Content.PropLog
 import Content.Classical
+import Content.PredLog
 
 open Content
 --import Content.Meta.Lean
@@ -34,3 +35,4 @@ commented out
 {include 1 Intro}
 {include 1 PropLog}
 {include 1 Classical}
+{comment}[{include 1 PredLog}]

@@ -34,8 +34,7 @@ theorem dm2_attempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
     apply npq
     constructor
     exact p
-    -- stuck here without classical reasoning:
-    -- need a proof of Q
+    -- stuck here
     sorry
   · intro npnq pq
     cases pq with

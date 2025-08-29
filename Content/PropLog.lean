@@ -507,12 +507,16 @@ There is one more useful tactic which is not related to any propositional connec
 Now it is pretty easy to *cut* this proof by showing that `Q ∨ Q → Q` and then use this to show the result. But there is a better way which avoids introducing a new theorem and which is called `have`. This is best explained by an example:
 
 ```anchor ExampleHave
-theorem contr : ¬ (P ∧ ¬ P) := by
-  intro pnp
-  cases pnp with
-  | intro p np =>
-    apply np
+example : (P → Q ∨ Q) → (P → Q) := by
+  intro h p
+  have qorq : Q ∨ Q := by
+    apply h
     exact p
+  cases qorq with
+  | inl q =>
+      exact q
+  | inr q =>
+      exact q
 ```
 
 We introduce a new goal by saying
@@ -569,7 +573,7 @@ These correspond to the introduction and elimination rules in *natural deduction
 
 ![Gerhard Gentzen (1909–1945)](gentzen.jpeg)
 
-He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* ir the *Hauptsatz*).
+He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* or the *Hauptsatz* (main theorem)).
 
 The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is different. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
 
