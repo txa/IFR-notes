@@ -35,4 +35,4 @@ commented out
 {include 1 Intro}
 {include 1 PropLog}
 {include 1 Classical}
-{comment}[{include 1 PredLog}]
+{include 1 PredLog}

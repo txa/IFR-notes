@@ -6,7 +6,8 @@ open Verso.Genre.Manual.InlineLean
 open Verso.Code.External
 
 set_option verso.exampleProject "."
-set_option verso.exampleModule "Content.PredLogProofs"
+set_option verso.exampleModule "Content.PredLogProofsX"
+--set_option verso.exampleModule "Content.ClassicalProofs"
 
 #doc (Manual) "Predicate Logic" =>
 
@@ -14,8 +15,8 @@ set_option verso.exampleModule "Content.PredLogProofs"
 
 Predicate logic extends propositional logic, we can use it to talk about objects and their properties.
 The objects are organized in *types*, such as $`ℕ : Type` the type of natural
-numbers $`\{0,1,2,3\dots}` or $`bool : Type` the type of
-booleans $`{tt , ff},` or lists over a
+numbers $`\{0,1,2,3\dots\}` or $`bool : Type` the type of
+booleans $`\{tt , ff\},` or lists over a
 given $`A : Type`: $`list A : Type`,  which we will
 introduce in more detail soon.
 
@@ -23,7 +24,7 @@ To avoid talking about specific types which we will introduce later
 we introduce some type variables:
 
 ```anchor ExampleTypes
-variable (A B C : Type)
+variable {A B C : Type}
 ```
 
 We talk about types where you may be used to *sets*. While they are
@@ -31,21 +32,21 @@ subtle differences (types are static while we can reason about set
 membership in set theory) for our purposes types are just a replacement of
 sets.
 
-A predicate is just another word for a property, e.g. we may use $`Prime : ℕ →
-Prop` to express that a number is a prime number. We can form
-propositions such as $`Prime 3` and $`Prime 4`, the first one
+A predicate is just another word for a property, e.g. we may use
+`Prime : ℕ → Prop` to express that a number is a prime number. We can form
+propositions such as `Prime 3` and `Prime 4`, the first one
 should be provable while the negation of the second holds. Predicates
 may have several inputs in which case we usually call them relations,
-examples are $`≤ : ℕ → ℕ → Prop` or $`inList : A → list A → Prop` to
-form propositions like $`2 ≤ 3` and $`InList 1 [1,2,3]` (both of
+examples are `≤ : ℕ → ℕ → Prop` or `inList : A → list A → Prop` to
+form propositions like `2 ≤ 3` and `InList 1 [1,2,3]` (both of
 them should be provable).
 
 In the sequel we will use some generic predicates for examples, such
 as
-
 ```anchor ExamplePred
-variable (A B C : Type)
+variable {PP QQ : A → Prop}
 ```
+
 # Quantifiers
 
 The most important innovation of predicate logic are the quantifiers,
@@ -58,7 +59,10 @@ which we can use to form new propositions:
 
 Here are some examples of propositions in predicate logic:
 ```anchor ExampleProps
-variable (A B C : Type)
+#check ∀ x : A, PP x ∧ Q
+#check (∀ x : A , PP x) ∧ Q
+#check ∀ x:A , (∃ x : A , PP x) ∧ QQ x
+#check ∀ y:A , (∃ z : A , PP z) ∧ QQ y
 ```
 
 Both quantifiers bind weaker than any other propositional operator,
@@ -110,7 +114,12 @@ clever* and `QQ x` means *x is funny* then we arrive at:
   then all students are funny.*
 
 ```anchor ExampleForall
-variable (A B C : Type)
+example : (∀ x : A, PP x)
+  → (∀ y : A, PP y → QQ y)
+  → ∀ z : A , QQ z := by
+  intro p pq a
+  apply pq
+  apply p
 ```
 Note that after `intro` the proof state is::
 
@@ -134,7 +143,28 @@ funny*.
 
 Here is the Lean proof:
 ```anchor ExampleAllAnd
-variable (A B C : Type)
+example : (∀ x : A, PP x ∧ QQ x)
+  ↔ (∀ x : A , PP x) ∧ (∀ x : A, QQ x) := by
+  constructor
+  intro h
+  constructor
+  intro a
+  have pq : PP a ∧ QQ a := by
+    apply h
+  cases pq with
+  | intro pa qa => exact pa
+  intro a
+  have pq : PP a ∧ QQ a := by
+    apply h
+  cases pq with
+  | intro pa qa => exact qa
+  intro h
+  cases h with
+  | intro hp hq =>
+    intro a
+    constructor
+    apply hp
+    apply hq
 ```
 I am using `have` which we have already seen in ... After `intro a` I am in the
 following state (ignoring the parts not relevant now)::
@@ -233,5 +263,34 @@ Here is the english version
 Here is the complete Lean proof (for you to step through online):
 
 ```anchor ExampleExOr
-variable (A B C : Type)
+example :
+    (∃ x : A, PP x ∨ QQ x) ↔
+    (∃ x : A , PP x) ∨ (∃ x : A, QQ x) := by
+  constructor
+  · intro h
+    cases h with
+    | intro a ha =>
+      cases ha with
+      | inl pa =>
+          apply Or.inl
+          constructor
+          apply pa
+      | inr qa =>
+          apply Or.inr
+          constructor
+          exact qa
+  · intro h
+    cases h with
+    | inl hp =>
+        cases hp with
+        | intro a pa =>
+          constructor
+          apply Or.inl
+          exact pa
+    | inr hq =>
+        cases hq with
+        | intro a qa =>
+          constructor
+          apply Or.inr
+          exact qa
 ```

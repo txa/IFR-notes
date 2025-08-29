@@ -1,11 +1,11 @@
 variable {P Q R : Prop}
 
 -- ANCHOR: ExampleTypes
-variable (A B C : Type)
+variable {A B C : Type}
 -- ANCHOR_END: ExampleTypes
 
 -- ANCHOR: ExamplePred
-variable (PP QQ : A → Prop)
+variable {PP QQ : A → Prop}
 -- ANCHOR_END: ExamplePred
 
 -- ANCHOR: ExampleProps
