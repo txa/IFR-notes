@@ -1,8 +1,30 @@
+import Mathlib.Tactic
 variable {P Q R : Prop}
 
 -- ANCHOR: ExampleTypes
 variable {A B C : Type}
 -- ANCHOR_END: ExampleTypes
+
+-- ANCHOR: ExampleFuns
+def double : ℕ → ℕ
+| n => n + n
+
+def foo : ℕ → ℕ → ℕ
+| m , n => m + n + n
+-- ANCHOR_END: ExampleFuns
+
+-- ANCHOR: ExampleFuns2
+def double' (n : ℕ) : ℕ
+:= n + n
+
+def foo' (m n : ℕ) : ℕ
+:= m + n + n
+-- ANCHOR_END: ExampleFuns2
+
+-- ANCHOR: ExampleApp
+#eval double 2
+#eval foo' 2 3
+-- ANCHOR_END: ExampleApp
 
 -- ANCHOR: ExamplePred
 variable {PP QQ : A → Prop}
@@ -144,8 +166,35 @@ theorem transEq : ∀ x y z : A, x = y → y = z → x = z := by
 -- ANCHOR_END: ExampleEqTrans
 
 -- ANCHOR: ExampleEqTrans2
-theorem trans_eq' : ∀ x y z : A, x = y → y = z → x = z := by
+theorem transEq' : ∀ x y z : A, x = y → y = z → x = z := by
   intro x y z xy yz
   rw [← xy] at yz
   exact yz
 -- ANCHOR_END: ExampleEqTrans2
+
+-- ANCHOR: ExampleEqTacs
+example : ∀ x y : A, x = y → y = x := by
+  intro x y p
+  symm
+  exact p
+
+example : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  trans
+  exact xy
+  exact yz
+-- ANCHOR_END: ExampleEqTacs
+
+-- ANCHOR: ExampleCalc
+example : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  calc
+    x = y := by exact xy
+    _ = z := by exact yz
+-- ANCHOR_END: ExampleCalc
+
+-- ANCHOR: ExampleCongr
+example : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
+  intro f x y h
+  rw [h]
+-- ANCHOR_END: ExampleCongr

@@ -32,14 +32,38 @@ subtle differences (types are static while we can reason about set
 membership in set theory) for our purposes types are just a replacement of
 sets.
 
+We also have function types `A → B` which you know from functional programming. So for example we can define
+```anchor ExampleFuns
+def double : ℕ → ℕ
+| n => n + n
+
+def foo : ℕ → ℕ → ℕ
+| m , n => m + n + n
+```
+As in Haskell functions with several arguments are curried but note that you have to separate the parameters by `,`. An alternative is to use explicit function definitions:
+```anchor ExampleFuns2
+def double' (n : ℕ) : ℕ
+:= n + n
+
+def foo' (m n : ℕ) : ℕ
+:= m + n + n
+```
+As in Haskell function application is written without brackets, e.g.
+```anchor ExampleApp
+#eval double 2
+#eval foo' 2 3
+```
+
 A predicate is just another word for a property, e.g. we may use
-`Prime : ℕ → Prop` to express that a number is a prime number. We can form
+`Prime : ℕ → Prop` to express that a number is a prime number. Note that a predicate is just a function!
+
+We can form
 propositions such as `Prime 3` and `Prime 4`, the first one
 should be provable while the negation of the second holds. Predicates
 may have several inputs in which case we usually call them relations,
-examples are `≤ : ℕ → ℕ → Prop` or `inList : A → list A → Prop` to
-form propositions like `2 ≤ 3` and `InList 1 [1,2,3]` (both of
-them should be provable).
+examples are `Nat.le : ℕ → ℕ → Prop` or `List.mem : A → list A → Prop` to
+form propositions like `Nat.le 2 3` and `List.mem 1 [1,2,3]` (both of
+them should be provable). Using defined notations these two examples can also be written as `2 ≤ 3` and `1 ∈ [1,2,3]`.
 
 In the sequel we will use some generic predicates for examples, such
 as
@@ -381,7 +405,7 @@ We have already shown reflexivity using `rfl`. We can show symmetry and
 transitivity using `rw`:
 
 ```anchor ExampleEqSym
-theorem sym_eq : ∀ x y : A, x = y → y = x := by
+theorem symEq : ∀ x y : A, x = y → y = x := by
   intro x y p
   rw [p]
 ```
@@ -440,18 +464,12 @@ Lean will infer `?m_1 := y` after we solve the first subgoal with
 
 A very nice way to do equational proofs is to use `calc`:
 
-```lean {linenums}
-variable (P Q R : Prop)
-variable (A B C : Type)
-variable (PP QQ : A → Prop)
-
--- BEGIN
+```anchor ExampleCalc
 example : ∀ x y z : A, x = y → y = z → x = z := by
   intro x y z xy yz
   calc
-    x = y := xy
-    _ = z := yz
--- END
+    x = y := by exact xy
+    _ = z := by exact yz
 ```
 
 Here each line shows an equality and its justification; `_` refers to
@@ -460,16 +478,10 @@ the right side of the previous line.
 Finally, equality is a *congruence*: functions preserve equality.
 If `f : A → B` and `x = y`, then `f x = f y`:
 
-```lean {linenums}
-namespace eq
-variable (A B : Type)
-
--- BEGIN
-theorem congr_arg : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
+```anchor ExampleCongr
+example : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
   intro f x y h
   rw [h]
--- END
-end eq
 ```
 
-We will use `congr_arg f` when we need to replace arguments under a function.
+We need to introduce functions!
