@@ -94,3 +94,58 @@ example :
           apply Or.inr
           exact qa
 -- ANCHOR_END: ExampleExOr
+
+-- ANCHOR: ExampleCurryPred
+theorem curryPred :
+    ((∃ x : A, PP x) → R)  ↔  (∀ x : A, PP x → R) := by
+  constructor
+  · intro ppr
+    intro a p
+    apply ppr
+    exact ⟨a, p⟩
+  · intro ppr
+    intro pp
+    cases pp with
+    | intro a p =>
+      exact ppr a p
+-- ANCHOR_END: ExampleCurryPred
+
+-- ANCHOR: ExampleEqRefl
+example : ∀ x : A, x = x := by
+  intro a
+  rfl
+-- ANCHOR_END: ExampleEqRefl
+
+-- ANCHOR: ExampleEqRw
+example : ∀ x y : A, x = y → PP y → PP x := by
+  intro x y eq p
+  rw [eq]
+  exact p
+-- ANCHOR_END: ExampleEqRw
+
+-- ANCHOR: ExampleEqRw2
+example : ∀ x y : A, x = y → PP x → PP y := by
+  intro x y eq p
+  rw [← eq]
+  exact p
+-- ANCHOR_END: ExampleEqRw2
+
+-- ANCHOR: ExampleEqSym
+theorem symEq : ∀ x y : A, x = y → y = x := by
+  intro x y p
+  rw [p]
+-- ANCHOR_END: ExampleEqSym
+
+-- ANCHOR: ExampleEqTrans
+theorem transEq : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  rw [xy]
+  exact yz
+-- ANCHOR_END: ExampleEqTrans
+
+-- ANCHOR: ExampleEqTrans2
+theorem trans_eq' : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  rw [← xy] at yz
+  exact yz
+-- ANCHOR_END: ExampleEqTrans2

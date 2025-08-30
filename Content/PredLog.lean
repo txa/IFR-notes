@@ -14,10 +14,10 @@ set_option verso.exampleModule "Content.PredLogProofsX"
 # Predicates, relations and quantifiers
 
 Predicate logic extends propositional logic, we can use it to talk about objects and their properties.
-The objects are organized in *types*, such as $`ℕ : Type` the type of natural
-numbers $`\{0,1,2,3\dots\}` or $`bool : Type` the type of
+The objects are organized in *types*, such as `ℕ : Type` the type of natural
+numbers $`\{0,1,2,3\dots\}` or `bool : Type` the type of
 booleans $`\{tt , ff\},` or lists over a
-given $`A : Type`: $`list A : Type`,  which we will
+given `A : Type`: `list A : Type`,  which we will
 introduce in more detail soon.
 
 To avoid talking about specific types which we will introduce later
@@ -52,10 +52,10 @@ variable {PP QQ : A → Prop}
 The most important innovation of predicate logic are the quantifiers,
 which we can use to form new propositions:
 
-* universal quantification ($`∀`), read $`∀ x : A , PP x` as all
-  $`x` in $`A` satisfy $`PP x`.
-* existential quantification ($`∃`), read $`∃ x : A, PP x` as there
-  is an $`x` in $`A` satisfying $`PP x`.
+* universal quantification (`∀`), read `∀ x : A , PP x` as all
+  `x` in `A` satisfy `PP x`.
+* existential quantification (`∃`), read `∃ x : A, PP x` as there
+  is an `x` in `A` satisfying `PP x`.
 
 Here are some examples of propositions in predicate logic:
 ```anchor ExampleProps
@@ -66,24 +66,24 @@ Here are some examples of propositions in predicate logic:
 ```
 
 Both quantifiers bind weaker than any other propositional operator,
-that is we read $`∀ x : A, PP x ∧ Q` as $`∀ x : A , (PP x ∧ Q)`. We
-need parentheses to limit the scope, e.g. $`(∀ x : A, PP x) ∧ Q` which
+that is we read `∀ x : A, PP x ∧ Q` as `∀ x : A , (PP x ∧ Q)`. We
+need parentheses to limit the scope, e.g. `(∀ x : A, PP x) ∧ Q` which
 has a different meaning to the proposition before.
 
 It is important to understand bound variables, essentially they work
 like scoped variables in programming. We can shadow variables as in
-$`∀ x:A , (∃ x : A , PP x) ∧ QQ x`$, here the $`x` in  $`PP x`$
-refers to $`∃ x : A`$ while the $`x` in $`QQ x`$ refers to $`∀ x :
-A`$. Bound variables can be consistently renamed, hence the previous
-proposition is the same as $`∀ y:A , (∃ z : A , PP z) ∧ QQ y`$, which
+`∀ x:A , (∃ x : A , PP x) ∧ QQ x`, here the `x` in  `PP x`
+refers to `∃ x : A`$ while the `x` in `QQ x` refers to `∀ x :
+A`. Bound variables can be consistently renamed, hence the previous
+proposition is the same as `∀ y:A , (∃ z : A , PP z) ∧ QQ y`$, which
 is actually preferable since shadowing variables should be avoided
 because it confuses the human reader.
 
 Now we have introduced all these variables what can we do with
 them. We have new primitive proposition:
 
-* equality ($`=`), given $`a b : A`$ we write $`a = b`$ which we read
-  as $`a`$ is equal to $`b`$.
+* equality (`=`), given `a b : A` we write `a = b` which we read
+  as `a`$ is equal to `b`.
 
 In the moment we only have variables as elements of types but this
 will change soon when we introduce datatypes and functions.
@@ -97,8 +97,7 @@ this.
 
 If we have an assumption `h : ∀ x : A , PP x` and our current
 goal is `PP a` for some `a : A` then we can use `apply h` to
-prove our goal. Usually we have some combination of implication and for
-all like `h : ∀ x : A, PP x → QQ x` and now if our current goal is
+prove our goal. Usually we have some combination of implication and forall like `h : ∀ x : A, PP x → QQ x` and now if our current goal is
 `QQ a` and we invoke `apply h` Lean will instantiate `x` with
 `a` and it remains to show `QQ a`.
 
@@ -294,3 +293,183 @@ example :
           apply Or.inr
           exact qa
 ```
+
+# Another Currying equivalence
+
+You may have noticed that the way we prove propositions involving `→`
+and `∀` is very similar. In both cases wem use `assume` to prove
+them by introducing an assumption in the first case a proposition and
+in the secnde an element in a type and in both cases we use them using
+`apply` to prove the current goal. Similarily `∧` and `∃` behave
+similar: in both cases we prove them using constructor where we have
+to construct two components in the first case the two sides of the
+conjunction and in the second the element and the proof that it
+satisfies the property. And in both cases we are using `cases` with
+two components which basically replaces the assumption by its two
+components.
+
+The similarity can be seen by establishing another currying-style
+equivalence. While currying in propositional logic had the form
+
+`P ∧ Q → R ↔ P → Q → R`
+
+where we turn a conjunction into an implication, currying for
+predicate logic has the form
+
+`(∃ x : A, QQ x) → R  ↔ (∀ x : A , QQ x → R)`
+
+ths time we turn an existential into a universal quantifier. For the
+intuition, we use `QQ x` to mean `x` *is clever* and `R` means *the
+professor is happy*.  Hence the equivalence is:
+
+  *If there is a student who is clever then the professor is happy is
+  equivalent to saying if any student is clever then the professor is happy.*
+
+Here is the proof in Lean:
+```anchor ExampleCurryPred
+theorem curryPred :
+    ((∃ x : A, PP x) → R)  ↔  (∀ x : A, PP x → R) := by
+  constructor
+  · intro ppr
+    intro a p
+    apply ppr
+    exact ⟨a, p⟩
+  · intro ppr
+    intro pp
+    cases pp with
+    | intro a p =>
+      exact ppr a p
+```
+
+# Equality
+
+There is a generic relation which can be applied to any type:
+*equality*.  Given `a b : A` we can construct `a = b : Prop`
+expressing that `a` and `b` are equal. We can prove that
+everything is equal to itself using the tactic `rfl` (or `reflexivity`).
+```anchor ExampleEqRefl
+example : ∀ x : A, x = x := by
+  intro a
+  rfl
+```
+If we have assumed an equality `h : a = b` we can use it to *rewrite*
+`a` into `b` in the goal. That is if our goal is `PP a` we say
+`rw [h]` and this changes the goal into `PP b`. Here is a
+simple example (with a little twist):
+```anchor ExampleEqRw
+example : ∀ x y : A, x = y → PP y → PP x := by
+  intro x y eq p
+  rw [eq]
+  exact p
+```
+Sometimes we want to use the equality in the other direction, that is
+we want to replace `b` by `a`. In this case we use `rw [← h]`. Here is
+another example which is actually what I wanted to do first:
+```anchor ExampleEqRw2
+example : ∀ x y : A, x = y → PP x → PP y := by
+  intro x y eq p
+  rw [← eq]
+  exact p
+```
+Equality is an *equivalence relation*, it means that it is
+
+- reflexive  (`∀ x : A, x = x`),
+- symmetric (`∀ x y : A, x = y → y = x`)
+- transitive (`∀ x y z : A, x = y → y = z → x = z`)
+
+We have already shown reflexivity using `rfl`. We can show symmetry and
+transitivity using `rw`:
+
+```anchor ExampleEqSym
+theorem sym_eq : ∀ x y : A, x = y → y = x := by
+  intro x y p
+  rw [p]
+```
+After the `intro` the goal is::
+
+```
+x y : A,
+p : x = y
+⊢ y = x
+```
+
+After `rw [p]` the goal becomes `y = y` which is solved automatically
+because `rw` applies reflexivity if possible.
+
+Moving on to transitivity:
+```anchor ExampleEqTrans
+theorem transEq : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  rw [xy]
+  exact yz
+```
+Sometimes we want to use an equality not to rewrite the goal but to
+rewrite another assumption. We can do this using `at`, giving another
+proof of transitivity:
+```anchor ExampleEqTrans2
+theorem transEq' : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  rw [← xy] at yz
+  exact yz
+```
+Lean also provides built-in tactics to deal with symmetry and
+transitivity:
+```anchor ExampleEqTacs
+example : ∀ x y : A, x = y → y = x := by
+  intro x y p
+  symm
+  exact p
+
+example : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  trans
+  exact xy
+  exact yz
+```
+
+After we say `trans` the goals are split:
+
+```
+2 goals
+⊢ x = ?m_1
+⊢ ?m_1 = z
+```
+
+Lean will infer `?m_1 := y` after we solve the first subgoal with
+`exact xy`.
+
+A very nice way to do equational proofs is to use `calc`:
+
+```lean {linenums}
+variable (P Q R : Prop)
+variable (A B C : Type)
+variable (PP QQ : A → Prop)
+
+-- BEGIN
+example : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  calc
+    x = y := xy
+    _ = z := yz
+-- END
+```
+
+Here each line shows an equality and its justification; `_` refers to
+the right side of the previous line.
+
+Finally, equality is a *congruence*: functions preserve equality.
+If `f : A → B` and `x = y`, then `f x = f y`:
+
+```lean {linenums}
+namespace eq
+variable (A B : Type)
+
+-- BEGIN
+theorem congr_arg : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
+  intro f x y h
+  rw [h]
+-- END
+end eq
+```
+
+We will use `congr_arg f` when we need to replace arguments under a function.
