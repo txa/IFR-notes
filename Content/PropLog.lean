@@ -233,7 +233,7 @@ We can look at the programs generated from proofs by using the `#print` command 
 #print I
 ```
 ```anchorInfo PrintI
-theorem I : ∀ (P : Prop), P → P :=
+theorem PropLogicProofs.I : ∀ (P : Prop), P → P :=
 fun P h => h
 ```
 and
@@ -241,7 +241,7 @@ and
 #print C
 ```
 ```anchorInfo PrintC
-theorem C : ∀ (P Q R : Prop), (P → Q) → (Q → R) → P → R :=
+theorem PropLogicProofs.C : ∀ (P Q R : Prop), (P → Q) → (Q → R) → P → R :=
 fun P Q R p2q q2r p => q2r (p2q p)
 ```
 
@@ -445,7 +445,7 @@ As an example which involves both conjunction and disjunction we prove
 distributivity. In algebra we know the law
 `x(y+z) = xy + xz`; a
 similar law holds in propositional logic:
-```
+```anchor ExampleDistr
 example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
   sorry
 ```
@@ -573,7 +573,7 @@ These correspond to the introduction and elimination rules in *natural deduction
 
 ![Gerhard Gentzen (1909–1945)](gentzen.jpeg)
 
-He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* or the *Hauptsatz* (main theorem)).
+He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* ir the *Hauptsatz*).
 
 The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is different. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
 
@@ -587,5 +587,3 @@ example : P → P := by
 ```
 
 *Important.* There are many more tactics available in Lean, some with a higher degree of automation, and some tactics can be used in ways we have not discussed here. When solving exercises, please use only the tactics we have introduced and only in the ways we have described.
-
-Need to explain `have`!

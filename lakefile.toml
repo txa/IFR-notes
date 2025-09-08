@@ -12,9 +12,6 @@ git = "https://github.com/leanprover-community/mathlib4"
 rev = "master"
 
 [[lean_lib]]
-name = "IFRNotes"
-
-[[lean_lib]]
 name = "Content"   # NEW: tells Lean that modules under Content/… exist
 
 [[lean_exe]]

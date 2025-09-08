@@ -6,7 +6,7 @@ open Verso.Genre.Manual.InlineLean
 open Verso.Code.External
 
 set_option verso.exampleProject "."
-set_option verso.exampleModule "Content.PredLogProofsX"
+set_option verso.exampleModule "Content.PredLogProofs"
 
 #doc (Manual) "Predicate Logic" =>
 
