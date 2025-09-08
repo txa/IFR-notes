@@ -1,11 +1,36 @@
+import Content.ClassicalProofs
+import Mathlib.Tactic
+open ClassicalProofs
+
 variable {P Q R : Prop}
 
 -- ANCHOR: ExampleTypes
-variable (A B C : Type)
+variable {A B C : Type}
 -- ANCHOR_END: ExampleTypes
 
+-- ANCHOR: ExampleFuns
+def double : ℕ → ℕ
+| n => n + n
+
+def foo : ℕ → ℕ → ℕ
+| m , n => m + n + n
+-- ANCHOR_END: ExampleFuns
+
+-- ANCHOR: ExampleFuns2
+def double' (n : ℕ) : ℕ
+:= n + n
+
+def foo' (m n : ℕ) : ℕ
+:= m + n + n
+-- ANCHOR_END: ExampleFuns2
+
+-- ANCHOR: ExampleApp
+#eval double 2
+#eval foo' 2 3
+-- ANCHOR_END: ExampleApp
+
 -- ANCHOR: ExamplePred
-variable (PP QQ : A → Prop)
+variable {PP QQ : A → Prop}
 -- ANCHOR_END: ExamplePred
 
 -- ANCHOR: ExampleProps
@@ -94,3 +119,113 @@ example :
           apply Or.inr
           exact qa
 -- ANCHOR_END: ExampleExOr
+
+-- ANCHOR: ExampleCurryPred
+theorem curryPred :
+    ((∃ x : A, PP x) → R)  ↔  (∀ x : A, PP x → R) := by
+  constructor
+  · intro ppr
+    intro a p
+    apply ppr
+    exact ⟨a, p⟩
+  · intro ppr
+    intro pp
+    cases pp with
+    | intro a p =>
+      exact ppr a p
+-- ANCHOR_END: ExampleCurryPred
+
+-- ANCHOR: ExampleEqRefl
+example : ∀ x : A, x = x := by
+  intro a
+  rfl
+-- ANCHOR_END: ExampleEqRefl
+
+-- ANCHOR: ExampleEqRw
+example : ∀ x y : A, x = y → PP y → PP x := by
+  intro x y eq p
+  rw [eq]
+  exact p
+-- ANCHOR_END: ExampleEqRw
+
+-- ANCHOR: ExampleEqRw2
+example : ∀ x y : A, x = y → PP x → PP y := by
+  intro x y eq p
+  rw [← eq]
+  exact p
+-- ANCHOR_END: ExampleEqRw2
+
+-- ANCHOR: ExampleEqSym
+theorem symEq : ∀ x y : A, x = y → y = x := by
+  intro x y p
+  rw [p]
+-- ANCHOR_END: ExampleEqSym
+
+-- ANCHOR: ExampleEqTrans
+theorem transEq : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  rw [xy]
+  exact yz
+-- ANCHOR_END: ExampleEqTrans
+
+-- ANCHOR: ExampleEqTrans2
+theorem transEq' : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  rw [← xy] at yz
+  exact yz
+-- ANCHOR_END: ExampleEqTrans2
+
+-- ANCHOR: ExampleEqTacs
+example : ∀ x y : A, x = y → y = x := by
+  intro x y p
+  symm
+  exact p
+
+example : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  trans
+  exact xy
+  exact yz
+-- ANCHOR_END: ExampleEqTacs
+
+-- ANCHOR: ExampleCalc
+example : ∀ x y z : A, x = y → y = z → x = z := by
+  intro x y z xy yz
+  calc
+    x = y := by exact xy
+    _ = z := by exact yz
+-- ANCHOR_END: ExampleCalc
+
+-- ANCHOR: ExampleCongr
+example : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
+  intro f x y h
+  rw [h]
+-- ANCHOR_END: ExampleCongr
+
+-- ANCHOR: ExampleDm1Pred
+theorem dm1_pred {A : Type} {PP : A → Prop} :
+    ¬ (∃ x : A, PP x) ↔ ∀ x : A, ¬ PP x := by
+  constructor
+  · intro h x px
+    apply h; exact ⟨x, px⟩
+  · intro h ⟨a, pa⟩
+    apply h a pa
+-- ANCHOR_END: ExampleDm1Pred
+
+-- ANCHOR: ExampleDm2Pred
+theorem dm2Pred {A : Type} {PP : A → Prop} :
+    ¬ (∀ x : A, PP x) ↔ ∃ x : A, ¬ PP x := by
+  constructor
+  · intro h
+    apply raa
+    intro ne
+    apply h
+    intro a
+    apply raa
+    intro np
+    apply ne
+    exact ⟨a, np⟩
+  · intro h na
+    rcases h with ⟨a, np⟩
+    exact np (na a)
+-- ANCHOR_END: ExampleDm2Pred

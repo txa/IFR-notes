@@ -1,3 +1,4 @@
+namespace PropLogicProofs
 -- ANCHOR: Vars
 variable (P Q R : Prop)
 -- ANCHOR_END: Vars
@@ -142,3 +143,5 @@ example : P → P := by
   intro h
   assumption
 -- ANCHOR_END: ExampleAss
+
+end PropLogicProofs

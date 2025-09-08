@@ -1,3 +1,4 @@
+namespace ClassicalProofs
 variable {P Q R : Prop}
 
 -- ANCHOR: ExampleDm1
@@ -105,3 +106,5 @@ theorem em : P ∨ ¬ P := by
   apply AxRaa
   apply nnEm
 -- ANCHOR_END: ExampleAxRaa
+
+end ClassicalProofs

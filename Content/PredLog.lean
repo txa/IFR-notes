@@ -7,7 +7,6 @@ open Verso.Code.External
 
 set_option verso.exampleProject "."
 set_option verso.exampleModule "Content.PredLogProofsX"
---set_option verso.exampleModule "Content.ClassicalProofs"
 
 #doc (Manual) "Predicate Logic" =>
 
@@ -484,4 +483,87 @@ example : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
   rw [h]
 ```
 
-We need to introduce functions!
+# Classical Predicate Logic
+
+We can use classical logic in predicate logic even though the
+explanation using truth tables does not scale well. Think of them as
+"infinite truth tables."
+
+There are predicate-logic counterparts of de Morgan’s laws, which say
+that you can move negation through a quantifier by negating the
+component and switching the quantifier.
+
+## First de Morgan law (intuitionistic proof)
+
+```anchor ExampleDm1Pred
+theorem dm1_pred {A : Type} {PP : A → Prop} :
+    ¬ (∃ x : A, PP x) ↔ ∀ x : A, ¬ PP x := by
+  constructor
+  · intro h x px
+    apply h
+    constructor
+    apply px
+  · intro h ⟨a, pa⟩
+    apply h a pa
+```
+
+This direction does not require classical logic.
+
+## Second de Morgan law (needs classical logic)
+
+We need *reductio ad absurdum* (`raa`), which depends on excluded middle.
+Now the de Morgan law:
+
+```anchor ExampleDm2Pred
+theorem dm2Pred {A : Type} {PP : A → Prop} :
+    ¬ (∀ x : A, PP x) ↔ ∃ x : A, ¬ PP x := by
+  constructor
+  · intro h
+    apply raa
+    intro ne
+    apply h
+    intro a
+    apply raa
+    intro np
+    apply ne
+    constructor
+    apply np
+  · intro h na
+    cases h with
+    | intro a np =>
+        apply  np
+        apply na
+```
+
+We needed `raa` twice in the first direction.
+
+## Intuition
+
+The existential statement `∃ x : A, ¬ PP x` contains explicit
+information (it points to a witness `a`), but the negated universal
+`¬ (∀ x : A, PP x)` does not. Intuitively: *knowing that not all
+students are stupid does not give you a way to name a student who is
+not stupid*.
+
+# Summary of tactics
+
+Here is the summary of basic tactics for predicate logic:
+
+:::table
+*
+  *            {comment}[]
+  * How to prove?
+  * How to use?
+*
+  * `∀`
+  * `intro h`
+  * `apply h`
+*
+  * `∃`
+  * `constructor`
+  * `cases h with | intro x p => …`
+*
+  * `=`
+  * `rfl`
+  * `rw [h]` / `rw [← h]`
+:::

@@ -1,4 +1,7 @@
+import Content.ClassicalProofs
 import Mathlib.Tactic
+open ClassicalProofs
+
 variable {P Q R : Prop}
 
 -- ANCHOR: ExampleTypes
@@ -198,3 +201,36 @@ example : ∀ f : A → B, ∀ x y : A, x = y → f x = f y := by
   intro f x y h
   rw [h]
 -- ANCHOR_END: ExampleCongr
+
+-- ANCHOR: ExampleDm1Pred
+theorem dm1_pred {A : Type} {PP : A → Prop} :
+    ¬ (∃ x : A, PP x) ↔ ∀ x : A, ¬ PP x := by
+  constructor
+  · intro h x px
+    apply h
+    constructor
+    apply px
+  · intro h ⟨a, pa⟩
+    apply h a pa
+-- ANCHOR_END: ExampleDm1Pred
+
+-- ANCHOR: ExampleDm2Pred
+theorem dm2Pred {A : Type} {PP : A → Prop} :
+    ¬ (∀ x : A, PP x) ↔ ∃ x : A, ¬ PP x := by
+  constructor
+  · intro h
+    apply raa
+    intro ne
+    apply h
+    intro a
+    apply raa
+    intro np
+    apply ne
+    constructor
+    apply np
+  · intro h na
+    cases h with
+    | intro a np =>
+        apply  np
+        apply na
+-- ANCHOR_END: ExampleDm2Pred
