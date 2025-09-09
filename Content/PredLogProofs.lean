@@ -210,8 +210,11 @@ theorem dm1_pred {A : Type} {PP : A → Prop} :
     apply h
     constructor
     apply px
-  · intro h ⟨a, pa⟩
-    apply h a pa
+  · intro h np
+    cases np with
+    | intro a pa =>
+        apply h
+        apply pa
 -- ANCHOR_END: ExampleDm1Pred
 
 -- ANCHOR: ExampleDm2Pred
