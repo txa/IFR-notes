@@ -14,6 +14,9 @@ rev = "master"
 [[lean_lib]]
 name = "Content"   # NEW: tells Lean that modules under Content/… exist
 
+[[lean_lib]]
+name = "IFRNotes" 
+
 [[lean_exe]]
 name = "ifrnotes"
 root = "Main"

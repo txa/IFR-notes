@@ -500,9 +500,7 @@ theorem dm1_pred {A : Type} {PP : A → Prop} :
     ¬ (∃ x : A, PP x) ↔ ∀ x : A, ¬ PP x := by
   constructor
   · intro h x px
-    apply h
-    constructor
-    apply px
+    apply h; exact ⟨x, px⟩
   · intro h ⟨a, pa⟩
     apply h a pa
 ```
@@ -526,13 +524,10 @@ theorem dm2Pred {A : Type} {PP : A → Prop} :
     apply raa
     intro np
     apply ne
-    constructor
-    apply np
+    exact ⟨a, np⟩
   · intro h na
-    cases h with
-    | intro a np =>
-        apply  np
-        apply na
+    rcases h with ⟨a, np⟩
+    exact np (na a)
 ```
 
 We needed `raa` twice in the first direction.

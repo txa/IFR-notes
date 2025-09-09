@@ -207,7 +207,9 @@ theorem dm1_pred {A : Type} {PP : A → Prop} :
     ¬ (∃ x : A, PP x) ↔ ∀ x : A, ¬ PP x := by
   constructor
   · intro h x px
-    apply h; exact ⟨x, px⟩
+    apply h
+    constructor
+    apply px
   · intro h ⟨a, pa⟩
     apply h a pa
 -- ANCHOR_END: ExampleDm1Pred
@@ -224,8 +226,11 @@ theorem dm2Pred {A : Type} {PP : A → Prop} :
     apply raa
     intro np
     apply ne
-    exact ⟨a, np⟩
+    constructor
+    apply np
   · intro h na
-    rcases h with ⟨a, np⟩
-    exact np (na a)
+    cases h with
+    | intro a np =>
+        apply  np
+        apply na
 -- ANCHOR_END: ExampleDm2Pred
