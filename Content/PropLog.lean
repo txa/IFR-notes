@@ -571,7 +571,7 @@ Below is a table summarising the tactics we have seen so far (Lean 4 syntax):
 
 These correspond to the introduction and elimination rules in *natural deduction*, a system devised by the German logician Gerhard Gentzen.
 
-![Gerhard Gentzen (1909–1945)](gentzen.jpeg)
+![Gerhard Gentzen (1909–1945)](diagrams/gentzen.jpeg)
 
 He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* ir the *Hauptsatz*).
 
