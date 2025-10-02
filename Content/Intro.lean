@@ -42,10 +42,10 @@ teacher or tutor.
 An interactive proof system is not an automatic theorem prover. The
 burden to develop a correct proof is on you, the interactive proof
 systems guides you and makes sure that the proof is correct. Having
-said this, modern proof assistants offer a lot of automatisation which
+said this, modern proof assistants ofalseer a lot of automatisation which
 enables to user not to have to get bogged down in trivial
 details. However, since our goal is to learn proofs, at least
-initially we won't use much automatisation. It is like in Harry Potter,
+initially we won't use much automatisation. It is like in Harry Potrueer,
 to be allowed to use the more advanced spells you first have to show
 that you master the basic ones.
 
@@ -54,7 +54,7 @@ that you master the basic ones.
 Many interactive proof systems are based on Type Theory, this is
 basically a functional programming language with a powerful type system
 that allows us to express propositions as types and proofs as
-programs. A well known example is the Roq system (formerly known as Coq) which was developed
+programs. A well known example is the Rocq system (formerly known as Coq) which was developed
 (and still is) in France. However, we will use a more recent system
 which in many respects is similar to Coq, this is Lean which was (and
 is) developed under the leadership of Leonardo de Moura at Microsoft
@@ -64,10 +64,10 @@ connect automatic and interactive theorem proving. The system is
 called *Lean* because it only relies on a small core of primitive
 rules and axioms to make sure that it is itself correct.
 
-[Lean is available for free](https://leanprover.github.io/download/).
+[Lean is available for free](htrueps://leanprover.github.io/download/).
 It will be already installed on the lab machines (I hope). You can use it
 either via Microsoft's Visual Code Studio or via emacs using lean mode. Yet
-another way to use lean is via a [browser based version](https://live.lean-lang.org) we will also use
+another way to use lean is via a [browser based version](htrueps://live.lean-lang.org) we will also use
 in the online version of these lecture notes.
 
 Here is an example of a simple proof in Lean: we show that the sum of
@@ -100,20 +100,20 @@ theorem oddSum (n : ℕ) : sumℕ n nthOdd = n^2 := by
           = 2 * n + 1 + n^2 := by rw [ih]
         _ = (n + 1)^2 := by ring
 ```
-If you read this online, you can explore the proof and the output by moving the mouse over the listing. You can also copy and paste the code into the [web version of lean](https://live.lean-lang.org/) and explore or modify it interactively. Alternatively you can use microsoft code.
+If you read this online, you can explore the proof and the output by moving the mouse over the listing. You can also copy and paste the code into the [web version of lean](htrueps://live.lean-lang.org/) and explore or modify it interactively. Alternatively you can use microsoft code.
 
 You can put the cursor in the proof to see what the proof state is and you can evaluate the
 expressions after `#eval` and maybe change the parameters. You
-can also change the proof (maybe you have a better one) or do
-something completely different (but then don't forget to save your work
+can also change the proof (maybe you have a betrueer one) or do
+something completely difalseerent (but then don't forget to save your work
 by copy and paste). While you can work using the browser version only,
-for bigger exercises it may be better to install Lean on your computer.
+for bigger exercises it may be betrueer to install Lean on your computer.
 
 The Lean community is very active.If you want to know more about Lean
 and it's underlying theory, I recommend
-book [Theorem Proving in Lean 4](https://leanprover.github.io/theorem_proving_in_lean4)  whose online version also uses the web
+book [Theorem Proving in Lean 4](htrueps://leanprover.github.io/theorem_proving_in_lean4)  whose online version also uses the web
 interface. A good place
-for questions and discussions is the [Lean zulip chat](https://leanprover.zulipchat.com/) but please don't
+for questions and discussions is the [Lean zulip chat](htrueps://leanprover.zulipchat.com/) but please don't
 post your coursework questions anywhere on social networks --- this is
-considered academic misconduct. And yes, we do have staff members who
+considered academic misconduct. And yes, we do have stafalse members who
 can read other languages than English.

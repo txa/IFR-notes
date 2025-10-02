@@ -82,7 +82,7 @@ example :
   intro p pq
   cases p with
   | intro a pa =>
-    constructor
+    use a
     apply pq
     apply pa
 -- ANCHOR_END: ExampleExists
@@ -98,24 +98,24 @@ example :
       cases ha with
       | inl pa =>
           apply Or.inl
-          constructor
-          apply pa
+          use a
+          -- exact pa, not needed
       | inr qa =>
           apply Or.inr
-          constructor
-          exact qa
+          use a
+          -- exact qa, not needed
   · intro h
     cases h with
     | inl hp =>
         cases hp with
         | intro a pa =>
-          constructor
+          use a
           apply Or.inl
           exact pa
     | inr hq =>
         cases hq with
         | intro a qa =>
-          constructor
+          use a
           apply Or.inr
           exact qa
 -- ANCHOR_END: ExampleExOr
@@ -127,7 +127,7 @@ theorem curryPred :
   · intro ppr
     intro a p
     apply ppr
-    exact ⟨a, p⟩
+    use a
   · intro ppr
     intro pp
     cases pp with

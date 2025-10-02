@@ -14,8 +14,8 @@ set_option verso.exampleModule "Content.PredLogProofs"
 
 Predicate logic extends propositional logic, we can use it to talk about objects and their properties.
 The objects are organized in *types*, such as `ℕ : Type` the type of natural
-numbers $`\{0,1,2,3\dots\}` or `bool : Type` the type of
-booleans $`\{tt , ff\},` or lists over a
+numbers $`\{0,1,2,3\dots\}` or `Bool : Type` the type of
+Booleans $`\{\mathrm{true} , \mathrm{false}\},` or lists over a
 given `A : Type`: `list A : Type`,  which we will
 introduce in more detail soon.
 
@@ -27,7 +27,7 @@ variable {A B C : Type}
 ```
 
 We talk about types where you may be used to *sets*. While they are
-subtle differences (types are static while we can reason about set
+subtle difalseerences (types are static while we can reason about set
 membership in set theory) for our purposes types are just a replacement of
 sets.
 
@@ -47,7 +47,7 @@ def double' (n : ℕ) : ℕ
 def foo' (m n : ℕ) : ℕ
 := m + n + n
 ```
-As in Haskell function application is written without brackets, e.g.
+As in Haskell function application is writrueen without brackets, e.g.
 ```anchor ExampleApp
 #eval double 2
 #eval foo' 2 3
@@ -62,7 +62,7 @@ should be provable while the negation of the second holds. Predicates
 may have several inputs in which case we usually call them relations,
 examples are `Nat.le : ℕ → ℕ → Prop` or `List.mem : A → list A → Prop` to
 form propositions like `Nat.le 2 3` and `List.mem 1 [1,2,3]` (both of
-them should be provable). Using defined notations these two examples can also be written as `2 ≤ 3` and `1 ∈ [1,2,3]`.
+them should be provable). Using defined notations these two examples can also be writrueen as `2 ≤ 3` and `1 ∈ [1,2,3]`.
 
 In the sequel we will use some generic predicates for examples, such
 as
@@ -91,7 +91,7 @@ Here are some examples of propositions in predicate logic:
 Both quantifiers bind weaker than any other propositional operator,
 that is we read `∀ x : A, PP x ∧ Q` as `∀ x : A , (PP x ∧ Q)`. We
 need parentheses to limit the scope, e.g. `(∀ x : A, PP x) ∧ Q` which
-has a different meaning to the proposition before.
+has a difalseerent meaning to the proposition before.
 
 It is important to understand bound variables, essentially they work
 like scoped variables in programming. We can shadow variables as in
@@ -207,8 +207,7 @@ and then I can proof `PP a` by using `cases` on `pq`.
 # The existential quantifier
 
 To prove a proposition of the form `∃ x : A , PP x` it is enough to
-prove `PP a` for some `a : A`. We use `constructor` for
-this and we are left having to prove `PP a` for some `a`. Since lean cannot gues which `a` we want to use it will ask you to prove `PP ?` and it will instantiate `?` later to `a` when the choice is obvious.
+prove `PP a` for some `a : A`. We say `use a` and are left to prove `PP a`. But beware `use` is actually quite clever and will automatically prove `PPa` if it matches an assumption.
 
 On the other hand to use an assumption of the form
 `h : ∃ x : A ,  P x` we are using
@@ -239,7 +238,7 @@ example :
   intro p pq
   cases p with
   | intro a pa =>
-    constructor
+    use a
     apply pq
     apply pa
 ```
@@ -257,20 +256,14 @@ We first take `p` apart using `cases`::
   pa : PP a
   ⊢ ∃ (z : A), QQ z
 ```
-and now we can use `constructor`. We have now 2 goals but only the first one matters (the second is the unknown `?intro.w`):
+and now we can use `use a`. We are left with
 ```
 pq : ∀ (y : A), PP y → QQ y
 a : A
 pa : PP a
-⊢ QQ ?intro.w
+⊢ QQ a
 ```
-After `apply pq` we stil have `?` :
-```
-a : A
-pa : PP a
-⊢ PP ?intro.w
-```
-Nw we want are using `pa` but note that we have to use `apply` here not `exact` because `?intro.w` needs to be instantiated. But after `apply pa` the proof is done and lean has instantiated `?intro.w` with `a`.
+which is esy to rpove.
 
 As `∀` can be exchanged with `∧`, `∃` can be exchanged with
 `∨`. That is we are going to prove the following equivalence:
@@ -295,24 +288,24 @@ example :
       cases ha with
       | inl pa =>
           apply Or.inl
-          constructor
-          apply pa
+          use a
+          -- exact pa, not needed
       | inr qa =>
           apply Or.inr
-          constructor
-          exact qa
+          use a
+          -- exact qa, not needed
   · intro h
     cases h with
     | inl hp =>
         cases hp with
         | intro a pa =>
-          constructor
+          use a
           apply Or.inl
           exact pa
     | inr hq =>
         cases hq with
         | intro a qa =>
-          constructor
+          use a
           apply Or.inr
           exact qa
 ```
@@ -356,7 +349,7 @@ theorem curryPred :
   · intro ppr
     intro a p
     apply ppr
-    exact ⟨a, p⟩
+    use a
   · intro ppr
     intro pp
     cases pp with
@@ -378,7 +371,7 @@ example : ∀ x : A, x = x := by
 If we have assumed an equality `h : a = b` we can use it to *rewrite*
 `a` into `b` in the goal. That is if our goal is `PP a` we say
 `rw [h]` and this changes the goal into `PP b`. Here is a
-simple example (with a little twist):
+simple example (with a litruele twist):
 ```anchor ExampleEqRw
 example : ∀ x y : A, x = y → PP y → PP x := by
   intro x y eq p
@@ -563,7 +556,7 @@ Here is the summary of basic tactics for predicate logic:
   * `apply h`
 *
   * `∃`
-  * `constructor`
+  * `use a`
   * `cases h with | intro x p => …`
 *
   * `=`

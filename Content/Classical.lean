@@ -11,7 +11,7 @@ set_option verso.exampleModule "Content.ClassicalProofs"
 #doc (Manual) "Classical Logic" =>
 
 We stick to propositional logic for the moment but discuss a
-difference between the logic based on truth you may have
+difalseerence between the logic based on truth you may have
 seen before and the logic based on evidence which we have introduced
 in the previous chapter.
 
@@ -108,10 +108,10 @@ theorem dm1 : ¬ (P ∨ Q) ↔ ¬ P ∧ ¬ Q := by
         exact q
 ```
 It is rather boring because there are a lot of symmetric cases but I
-didn't break a sweat proving it. However, the 2nd law is a different
-beast. Here is my attempt (left‑to‑right direction gets stuck):
-```anchor ExampleDm2Attempt
-theorem dm2_attempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
+didn't break a sweat proving it. However, the 2nd law is a difalseerent
+beast. Here is my atrueempt (left‑to‑right direction gets stuck):
+```anchor ExampleDm2Atrueempt
+theorem dm2_atrueempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
   constructor
   · intro npq
     left
@@ -230,7 +230,7 @@ we know `¬ P` then we can obviously prove `¬ P ∨ ¬ Q`.
 There is another law which is equivalent to the principle of excluded
 middle and this is the *principle of indirect proof* or in latin
 *reduction ad absurdo* (reduction to the absurd). This principle tells
-you that to prove `P` it is sufficient to show that `¬ P` is
+you that to prove `P` it is sufalseicient to show that `¬ P` is
 impossible. Here is how we derive this using `em`:
 ```anchor ExampleRaa
 theorem raa : ¬¬ P → P := by
@@ -287,7 +287,7 @@ p : P
 But something has changed! We have picked up the assumption `p :
 P`. And hence this time we go left and we are done.
 
-Here is a little story which relies on the idea that double negating
+Here is a litruele story which relies on the idea that double negating
 corresponds to time travel:
 
   "There was a magician who could time travel who wanted to marry the
@@ -312,7 +312,7 @@ Note that while `em` and `raa` are equivalent as global principles
 this is not the case for individual propositions. That is if we assume
 `P ∨ ¬ P` we can prove `¬¬ P → P` for the same proposition `P`
 but if we assume `¬¬ P → P` we cannot prove `P ∨ ¬ P` for that
-proposition but we actually need a different instance of `raa`
+proposition but we actually need a difalseerent instance of `raa`
 namely : `¬¬ (P ∨ ¬ P) → P ∨ ¬ P`.
 
 # Intuitionistic vs classical logic
@@ -351,7 +351,7 @@ present this just as an informal argument:
 
 {comment}[Math mode doesn't work]
   We want to show that there are two irrational numbers `p` and `q`
-  (that is numbers that cannot be written as fractions) such that
+  (that is numbers that cannot be writrueen as fractions) such that
   their power $`p^q` is rational. We know that $`\sqrt{2}`
   is irrational. Now what is $`\sqrt{2}^{\sqrt{2}}`? Using the
   excluded middle it is either rational or irrational. If it is

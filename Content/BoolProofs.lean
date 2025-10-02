@@ -1,54 +1,84 @@
 namespace BoolProofs
 
--- ANCHOR: BoolDef
-inductive bool : Type
-| ff : bool
-| tt : bool
--- ANCHOR_END: BoolDef
-
-open bool
+open Bool
 
 -- ANCHOR: bnot
-def bnot : bool → bool
-| tt => ff
-| ff => tt
+def not : Bool → Bool
+| true => false
+| false => true
 -- ANCHOR_END: bnot
 
-def band : bool → bool → bool
-| tt , b => b
-| ff , _ => ff
+def and : Bool → Bool → Bool
+| true , b => b
+| false , _ => false
 
-def bor : bool → bool → bool
-| tt , _ => tt
-| ff , b => b
+def or : Bool → Bool → Bool
+| true , _ => true
+| false , b => b
 
-local prefix:90 "!" => bnot
-local infixl:50 " && " => band
-local infixl:40 " || " => bor
+-- local notation:max "!'" b:90 => bnot b
+-- local infixl:50 " && " => band
+-- local infixl:40 " || " => bor
 
-#eval ! tt
-example : ∀ b : bool, b=tt ∨ b=ff := by
+macro_rules
+  | `(! $b)      => `(not $b)
+  | `($a && $b)  => `(and $a $b)
+  | `($a || $b)  => `(or  $a $b)
+
+#eval (! true)
+#eval true || false
+#eval true && false
+
+example : ∀ b : Bool, b=true ∨ b=false := by
 intro b
 cases b with
-| tt =>
+| true =>
    left
    rfl
-| ff =>
+| false =>
    right
    rfl
 
-example : tt ≠ ff := by
+example : true ≠ false := by
 intro q
 cases q
 
+example : ∀ b:Bool, (! b) ≠ b := by
+   intro b eq
+   cases b
+   . cases eq
+   . cases eq
 
+theorem b_dm2 : ∀ b c : Bool,
+   (! (b && c)) = (!b || ! c) := by
+intro b c
+cases b
+. dsimp [and,not,or]
+. dsimp [and,not,or]
 
-theorem b_dm2 : ∀ b c : bool,
-   (! (b && c)) = ((! b) || (! c)) := by
-  intro b c
-  cases b with
-  | tt => dsimp [band,bnot,bor]
-  | ff => dsimp [band,bnot,bor]
+def isTrue : Bool → Prop
+| b => b = true
+
+theorem and_ok : ∀ b c : Bool,
+  isTrue (b && c) ↔ isTrue b ∧ isTrue c := by
+intro b c
+constructor
+. intro H
+  cases b
+  . dsimp [and,isTrue] at H
+    cases H
+  . constructor
+    . rfl
+    . dsimp [and] at H
+      assumption
+. intro H
+  cases H with
+  | intro Hb Hc =>
+    dsimp [isTrue] at Hb
+    rw [Hb]
+    dsimp [and]
+    assumption
+
 
 
 

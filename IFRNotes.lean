@@ -6,6 +6,10 @@ import Content.Intro
 import Content.PropLog
 import Content.Classical
 import Content.PredLog
+import Content.Bool
+-- {include 1 Classical}
+-- {include 1 PredLog}
+-- {include 1 Bool}
 
 open Content
 --import Content.Meta.Lean
@@ -24,15 +28,8 @@ authors := ["Thorsten Altenkirch"]
 
 ```comment
 {index}[notes] {comment}[only for index]
-bla
 
-
-after
-
-commented out
 ```
 
 {include 1 Intro}
 {include 1 PropLog}
-{include 1 Classical}
-{include 1 PredLog}

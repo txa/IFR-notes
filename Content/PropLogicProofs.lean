@@ -53,12 +53,12 @@ theorem comAnd : P ∧ Q → Q ∧ P := by
     exact p
 -- ANCHOR_END: ExampleComAnd
 
--- ANCHOR: ExampleComAndIff
-theorem comAndIff : P ∧ Q ↔ Q ∧ P := by
+-- ANCHOR: ExampleComAndIfalse
+theorem comAndIfalse : P ∧ Q ↔ Q ∧ P := by
   constructor
   apply comAnd
   apply comAnd
--- ANCHOR_END: ExampleComAndIff
+-- ANCHOR_END: ExampleComAndIfalse
 
 -- ANCHOR: ExampleCurry
 theorem curry : P ∧ Q → R ↔ P → Q → R := by

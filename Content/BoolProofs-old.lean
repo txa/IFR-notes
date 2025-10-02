@@ -1,49 +1,49 @@
 namespace BoolProofs
 
-inductive bool : Type
-| ff : bool
-| tt : bool
+inductive Bool : Type
+| false : Bool
+| true : Bool
 
-open bool
+open Bool
 
-instance : Repr BoolProofs.bool where
+instance : Repr BoolProofs.Bool where
   reprPrec
-  | .ff, _ => Std.Format.text "ff"
-  | .tt, _ => Std.Format.text "tt"
+  | .false, _ => Std.Format.text "false"
+  | .true, _ => Std.Format.text "true"
 
-def bnot : bool → bool
-| tt => ff
-| ff => tt
+def bnot : Bool → Bool
+| true => false
+| false => true
 
-def band : bool → bool → bool
-| tt , b => b
-| ff , _ => ff
+def band : Bool → Bool → Bool
+| true , b => b
+| false , _ => false
 
-def bor : bool → bool → bool
-| tt , _ => tt
-| ff , b => b
+def bor : Bool → Bool → Bool
+| true , _ => true
+| false , b => b
 
 local prefix:90 "!" => bnot
 local infixl:50 " && " => band
 local infixl:40 " || " => bor
 
-#reduce ff && (tt || ff)
-#reduce tt && (tt || ff)
+#reduce false && (true || false)
+#reduce true && (true || false)
 
-def band2 : bool → bool → bool
-| b , tt => b
-| _ , ff => ff
+def band2 : Bool → Bool → Bool
+| b , true => b
+| _ , false => false
 
-def bor2 : bool → bool → bool
-| _ , tt  => tt
-| b , ff => b
+def bor2 : Bool → Bool → Bool
+| _ , true  => true
+| b , false => b
 
-variable (x : bool)
+variable (x : Bool)
 
-#reduce band tt x
-#reduce band2 tt x
-#reduce band x tt
-#reduce band2 x tt
+#reduce band true x
+#reduce band2 true x
+#reduce band x true
+#reduce band2 x true
 
 
 
