@@ -556,10 +556,10 @@ These correspond to the introduction and elimination rules in *natural deduction
 
 He also proved that in his system cuts can always be avoided (called the *cut elimination theorem* or the *Hauptsatz*).
 
-The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is difalseerent. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
+The surface syntax for using conjunction and disjunction looks similar—both use `cases`—but the effect is different. For `∧`, both components become available in the single subgoal; for `∨`, you get two subgoals, one per alternative.
 
 
-We also have `exact h`, which is a structural tactic that doesn't fit the scheme above (and more generally `exact t` for any proof term `t`). Another structural tatcic is `have` for introducing intermediate goals. There is also `assumption`, which checks whether any assumption matches the current goal. Thus we could have writrueen the first proof as:
+We also have `exact h`, which is a structural tactic that doesn't fit the scheme above (and more generally `exact t` for any proof term `t`). Another structural tactic is `have` for introducing intermediate goals. There is also `assumption`, which checks whether any assumption matches the current goal. Thus we could have written the first proof as:
 
 ```anchor ExampleAss
 example : P → P := by
