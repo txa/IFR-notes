@@ -2,19 +2,23 @@ namespace BoolProofs
 
 open Bool
 
--- ANCHOR: bnot
+-- ANCHOR: not
 def not : Bool → Bool
 | true => false
 | false => true
--- ANCHOR_END: bnot
+-- ANCHOR_END: not
 
+-- ANCHOR: and
 def and : Bool → Bool → Bool
 | true , b => b
 | false , _ => false
+-- ANCHOR_END: and
 
+-- ANCHOR: or
 def or : Bool → Bool → Bool
 | true , _ => true
 | false , b => b
+-- ANCHOR_END: or
 
 -- local notation:max "!'" b:90 => bnot b
 -- local infixl:50 " && " => band
