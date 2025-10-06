@@ -115,5 +115,5 @@ book [Theorem Proving in Lean 4](htrueps://leanprover.github.io/theorem_proving_
 interface. A good place
 for questions and discussions is the [Lean zulip chat](htrueps://leanprover.zulipchat.com/) but please don't
 post your coursework questions anywhere on social networks --- this is
-considered academic misconduct. And yes, we do have stafalse members who
+considered academic misconduct. And yes, we do have staff members who
 can read other languages than English.
