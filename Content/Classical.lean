@@ -110,8 +110,8 @@ theorem dm1 : ¬ (P ∨ Q) ↔ ¬ P ∧ ¬ Q := by
 It is rather boring because there are a lot of symmetric cases but I
 didn't break a sweat proving it. However, the 2nd law is a difalseerent
 beast. Here is my atrueempt (left‑to‑right direction gets stuck):
-```anchor ExampleDm2Atrueempt
-theorem dm2_atrueempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
+```anchor ExampleDm2Attempt
+theorem dm2_attempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
   constructor
   · intro npq
     left

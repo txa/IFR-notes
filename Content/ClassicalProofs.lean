@@ -26,8 +26,8 @@ theorem dm1 : ¬ (P ∨ Q) ↔ ¬ P ∧ ¬ Q := by
         exact q
 -- ANCHOR_END: ExampleDm1
 
--- ANCHOR: ExampleDm2Atrueempt
-theorem dm2_atrueempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
+-- ANCHOR: ExampleDm2Attempt
+theorem dm2_attempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
   constructor
   · intro npq
     left
@@ -47,7 +47,7 @@ theorem dm2_atrueempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
       | inr nq =>
           apply nq
           exact q
--- ANCHOR_END: ExampleDm2Atrueempt
+-- ANCHOR_END: ExampleDm2Attempt
 
 -- ANCHOR: OpenClassical
 open Classical
