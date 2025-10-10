@@ -2,6 +2,24 @@ namespace BoolProofs
 
 open Bool
 
+-- ANCHOR: allBool
+theorem allBool : ∀ b : Bool, b=true ∨ b=false := by
+intro b
+cases b with
+| true =>
+   left
+   rfl
+| false =>
+   right
+   rfl
+-- ANCHOR_END: allBool
+
+-- ANCHOR: noConfBool
+theorem noConfBool : true ≠ false := by
+intro q
+cases q
+-- ANCHOR_END: noConfBool
+
 -- ANCHOR: not
 def not : Bool → Bool
 | true => false
@@ -20,32 +38,24 @@ def or : Bool → Bool → Bool
 | false , b => b
 -- ANCHOR_END: or
 
--- local notation:max "!'" b:90 => bnot b
--- local infixl:50 " && " => band
--- local infixl:40 " || " => bor
-
 macro_rules
   | `(! $b)      => `(not $b)
   | `($a && $b)  => `(and $a $b)
   | `($a || $b)  => `(or  $a $b)
 
-#eval (! true)
-#eval true || false
-#eval true && false
+-- ANCHOR: evalBool
+#eval ! false || false && true
+-- ANCHOR_END: evalBool
 
-example : ∀ b : Bool, b=true ∨ b=false := by
-intro b
-cases b with
-| true =>
-   left
-   rfl
-| false =>
-   right
-   rfl
+-- ANCHOR: boolx
+def and' : Bool → Bool → Bool
+| b , true => b
+| _ , false  => false
 
-example : true ≠ false := by
-intro q
-cases q
+def or' : Bool → Bool → Bool
+| _ , true => true
+| b , false => b
+-- ANCHOR_END: boolx
 
 example : ∀ b:Bool, (! b) ≠ b := by
    intro b eq
@@ -57,8 +67,8 @@ theorem b_dm2 : ∀ b c : Bool,
    (! (b && c)) = (!b || ! c) := by
 intro b c
 cases b
-. dsimp [and,not,or]
-. dsimp [and,not,or]
+. rfl --dsimp [and,not,or]
+. rfl --dsimp [and,not,or]
 
 def isTrue : Bool → Prop
 | b => b = true
@@ -73,12 +83,12 @@ constructor
     cases H
   . constructor
     . rfl
-    . dsimp [and] at H
+    . --dsimp [and] at H
       assumption
 . intro H
   cases H with
   | intro Hb Hc =>
-    dsimp [isTrue] at Hb
+    --dsimp [isTrue] at Hb
     rw [Hb]
     dsimp [and]
     assumption
