@@ -74,7 +74,7 @@ theorem dm2_em : ¬ (P ∧ Q) → ¬ P ∨ ¬ Q := by
 -- ANCHOR_END: ExampleDm2Em
 
 -- ANCHOR: ExampleRaa
-theorem raa : ¬¬ P → P := by
+theorem byContradiction : ¬¬ P → P := by
   intro nnp
   have pnp : P ∨ ¬ P := by
     apply em
@@ -100,10 +100,10 @@ theorem nnEm : ¬ ¬ (P ∨ ¬ P) := by
 -- ANCHOR_END: ExampleNnEm
 
 -- ANCHOR: ExampleAxRaa
-axiom AxRaa : ¬¬ P → P
+axiom AxbyContradiction : ¬¬ P → P
 
 theorem em : P ∨ ¬ P := by
-  apply AxRaa
+  apply AxbyContradiction
   apply nnEm
 -- ANCHOR_END: ExampleAxRaa
 

@@ -11,7 +11,7 @@ set_option verso.exampleModule "Content.ClassicalProofs"
 #doc (Manual) "Classical Logic" =>
 
 We stick to propositional logic for the moment but discuss a
-difalseerence between the logic based on truth you may have
+difference between the logic based on truth you may have
 seen before and the logic based on evidence which we have introduced
 in the previous chapter.
 
@@ -108,8 +108,8 @@ theorem dm1 : ¬ (P ∨ Q) ↔ ¬ P ∧ ¬ Q := by
         exact q
 ```
 It is rather boring because there are a lot of symmetric cases but I
-didn't break a sweat proving it. However, the 2nd law is a difalseerent
-beast. Here is my atrueempt (left‑to‑right direction gets stuck):
+didn't break a sweat proving it. However, the 2nd law is a different
+beast. Here is my attempt (left‑to‑right direction gets stuck):
 ```anchor ExampleDm2Attempt
 theorem dm2_attempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
   constructor
@@ -135,7 +135,7 @@ theorem dm2_attempt : ¬ (P ∧ Q) ↔ ¬ P ∨ ¬ Q := by
 As you see I got stuck with the left to right direction, the right to
 left one went fine. What is the problem? The proof state after
 `intro npq`
-is (ignoring the propositional assumptions and the other goal)::
+is (ignoring the propositional assumptions and the other goal):
 
 ```
   npq : ¬(P ∧ Q)
@@ -144,14 +144,14 @@ is (ignoring the propositional assumptions and the other goal)::
 
 Now the question is do we go `left` or `right` - there seems to be
 no good reason for either because everything is symmetric. Ok let's
-try `left` we end up with::
+try `left` we end up with:
 
 ```
   npq : ¬(P ∧ Q)
   ⊢ ¬P
 ```
 
-Now the next steps is obvious `intro p`::
+Now the next steps is obvious `intro p`:
 
 ```
   npq : ¬(P ∧ Q),
@@ -159,7 +159,7 @@ Now the next steps is obvious `intro p`::
   ⊢ false
 ```
 
-There is only one purveyor of false, hence we say `apply npq`::
+There is only one purveyor of `False`, hence we say `apply npq`:
 
 ```
   npq : ¬(P ∧ Q),
@@ -168,7 +168,7 @@ There is only one purveyor of false, hence we say `apply npq`::
 ```
 
 Now we say `constructor` and the first subgoal is easily disposed
-with `exact p` but we end up with::
+with `exact p` but we end up with:
 
 ```
   npq : ¬(P ∧ Q),
@@ -230,10 +230,10 @@ we know `¬ P` then we can obviously prove `¬ P ∨ ¬ Q`.
 There is another law which is equivalent to the principle of excluded
 middle and this is the *principle of indirect proof* or in latin
 *reduction ad absurdo* (reduction to the absurd). This principle tells
-you that to prove `P` it is sufalseicient to show that `¬ P` is
+you that to prove `P` it is sufficient to show that `¬ P` is
 impossible. Here is how we derive this using `em`:
 ```anchor ExampleRaa
-theorem raa : ¬¬ P → P := by
+theorem byContradiction : ¬¬ P → P := by
   intro nnp
   have pnp : P ∨ ¬ P := by
     apply em
@@ -252,7 +252,7 @@ The idea is to assume `¬¬ P` and then prove `P` by analysing `P ∨
 contradiction with `¬¬ P` and we can use that false implies
 everything.
 
-We can also derive `em` from `raa`. The key observation is that we can
+We can also derive `em` from `byContradiction`. The key observation is that we can
 actually prove `¬ ¬ (P ∨ ¬ P)` without using classical logic.
 ```anchor ExampleNnEm
 theorem nnEm : ¬ ¬ (P ∨ ¬ P) := by
@@ -287,7 +287,7 @@ p : P
 But something has changed! We have picked up the assumption `p :
 P`. And hence this time we go left and we are done.
 
-Here is a litruele story which relies on the idea that double negating
+Here is a little story which relies on the idea that double negating
 corresponds to time travel:
 
   "There was a magician who could time travel who wanted to marry the
@@ -300,19 +300,19 @@ corresponds to time travel:
   he would just take the diamond, travel back in time and go for the
   first option."
 
-Now if we assume we have an axiom proving `raa` we can show `em`:
+Now if we assume we have an axiom proving `byContradiction` we can show `em`:
 ```anchor ExampleAxRaa
-axiom AxRaa : ¬¬ P → P
+axiom AxbyContradiction : ¬¬ P → P
 
 theorem em : P ∨ ¬ P := by
-  apply AxRaa
+  apply AxbyContradiction
   apply nnEm
 ```
 Note that while `em` and `raa` are equivalent as global principles
 this is not the case for individual propositions. That is if we assume
 `P ∨ ¬ P` we can prove `¬¬ P → P` for the same proposition `P`
 but if we assume `¬¬ P → P` we cannot prove `P ∨ ¬ P` for that
-proposition but we actually need a difalseerent instance of `raa`
+proposition but we actually need a different instance of `raa`
 namely : `¬¬ (P ∨ ¬ P) → P ∨ ¬ P`.
 
 # Intuitionistic vs classical logic
@@ -351,7 +351,7 @@ present this just as an informal argument:
 
 {comment}[Math mode doesn't work]
   We want to show that there are two irrational numbers `p` and `q`
-  (that is numbers that cannot be writrueen as fractions) such that
+  (that is numbers that cannot be written as fractions) such that
   their power $`p^q` is rational. We know that $`\sqrt{2}`
   is irrational. Now what is $`\sqrt{2}^{\sqrt{2}}`? Using the
   excluded middle it is either rational or irrational. If it is
@@ -380,5 +380,3 @@ i.e. which of the `¬ P` or `¬ Q` is true while `¬ (P ∧ Q)` is a
 information. In contrast the both sides of the first de Morgan law
 `¬ (P ∨ Q)` and `¬ P ∧ ¬ Q` are negative, i.e. contain no
 information.
-
-# Shorter versions of proofs
