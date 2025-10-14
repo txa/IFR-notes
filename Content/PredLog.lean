@@ -515,11 +515,11 @@ theorem dm2Pred {A : Type} {PP : A → Prop} :
     ¬ (∀ x : A, PP x) ↔ ∃ x : A, ¬ PP x := by
   constructor
   · intro h
-    apply raa
+    apply byContradiction
     intro ne
     apply h
     intro a
-    apply raa
+    apply byContradiction
     intro np
     apply ne
     constructor
