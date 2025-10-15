@@ -27,7 +27,7 @@ variable {A B C : Type}
 ```
 
 We talk about types where you may be used to *sets*. While they are
-subtle difalseerences (types are static while we can reason about set
+subtle differences (types are static while we can reason about set
 membership in set theory) for our purposes types are just a replacement of
 sets.
 
@@ -47,7 +47,7 @@ def double' (n : ℕ) : ℕ
 def foo' (m n : ℕ) : ℕ
 := m + n + n
 ```
-As in Haskell function application is writrueen without brackets, e.g.
+As in Haskell function application is written without brackets, e.g.
 ```anchor ExampleApp
 #eval double 2
 #eval foo' 2 3
@@ -62,7 +62,7 @@ should be provable while the negation of the second holds. Predicates
 may have several inputs in which case we usually call them relations,
 examples are `Nat.le : ℕ → ℕ → Prop` or `List.mem : A → list A → Prop` to
 form propositions like `Nat.le 2 3` and `List.mem 1 [1,2,3]` (both of
-them should be provable). Using defined notations these two examples can also be writrueen as `2 ≤ 3` and `1 ∈ [1,2,3]`.
+them should be provable). Using defined notations these two examples can also be written as `2 ≤ 3` and `1 ∈ [1,2,3]`.
 
 In the sequel we will use some generic predicates for examples, such
 as
@@ -91,14 +91,14 @@ Here are some examples of propositions in predicate logic:
 Both quantifiers bind weaker than any other propositional operator,
 that is we read `∀ x : A, PP x ∧ Q` as `∀ x : A , (PP x ∧ Q)`. We
 need parentheses to limit the scope, e.g. `(∀ x : A, PP x) ∧ Q` which
-has a difalseerent meaning to the proposition before.
+has a different meaning to the proposition before.
 
 It is important to understand bound variables, essentially they work
 like scoped variables in programming. We can shadow variables as in
 `∀ x:A , (∃ x : A , PP x) ∧ QQ x`, here the `x` in  `PP x`
 refers to `∃ x : A`$ while the `x` in `QQ x` refers to `∀ x :
 A`. Bound variables can be consistently renamed, hence the previous
-proposition is the same as `∀ y:A , (∃ z : A , PP z) ∧ QQ y`$, which
+proposition is the same as `∀ y:A , (∃ z : A , PP z) ∧ QQ y`, which
 is actually preferable since shadowing variables should be avoided
 because it confuses the human reader.
 
@@ -106,7 +106,7 @@ Now we have introduced all these variables what can we do with
 them. We have new primitive proposition:
 
 * equality (`=`), given `a b : A` we write `a = b` which we read
-  as `a`$ is equal to `b`.
+  as `a` is equal to `b`.
 
 In the moment we only have variables as elements of types but this
 will change soon when we introduce datatypes and functions.
@@ -115,7 +115,7 @@ will change soon when we introduce datatypes and functions.
 
 To prove that a proposition of the form `∀ x : A , PP x` holds we
 assume that there is given an arbitrary element `a` in `A` and
-prove it for this generic element, i.e. to prove `PP a`, we use `assume a` to do
+prove it for this generic element, i.e. to prove `PP a`, we use `intro a` to do
 this.
 
 If we have an assumption `h : ∀ x : A , PP x` and our current
@@ -207,7 +207,7 @@ and then I can proof `PP a` by using `cases` on `pq`.
 # The existential quantifier
 
 To prove a proposition of the form `∃ x : A , PP x` it is enough to
-prove `PP a` for some `a : A`. We say `use a` and are left to prove `PP a`. But beware `use` is actually quite clever and will automatically prove `PPa` if it matches an assumption.
+prove `PP a` for some `a : A`. We say `use a` and are left to prove `PP a`. But beware `use` is actually quite clever and will automatically prove `PP a` if it matches an assumption.
 
 On the other hand to use an assumption of the form
 `h : ∃ x : A ,  P x` we are using
@@ -263,7 +263,7 @@ a : A
 pa : PP a
 ⊢ QQ a
 ```
-which is esy to rpove.
+which is esy to prove.
 
 As `∀` can be exchanged with `∧`, `∃` can be exchanged with
 `∨`. That is we are going to prove the following equivalence:
@@ -313,14 +313,11 @@ example :
 # Another Currying equivalence
 
 You may have noticed that the way we prove propositions involving `→`
-and `∀` is very similar. In both cases wem use `assume` to prove
+and `∀` is very similar. In both cases wem use `intro` to prove
 them by introducing an assumption in the first case a proposition and
 in the secnde an element in a type and in both cases we use them using
 `apply` to prove the current goal. Similarily `∧` and `∃` behave
-similar: in both cases we prove them using constructor where we have
-to construct two components in the first case the two sides of the
-conjunction and in the second the element and the proof that it
-satisfies the property. And in both cases we are using `cases` with
+similar: we need to supply two components. And in both cases we are using `cases` with
 two components which basically replaces the assumption by its two
 components.
 
@@ -371,7 +368,7 @@ example : ∀ x : A, x = x := by
 If we have assumed an equality `h : a = b` we can use it to *rewrite*
 `a` into `b` in the goal. That is if our goal is `PP a` we say
 `rw [h]` and this changes the goal into `PP b`. Here is a
-simple example (with a litruele twist):
+simple example (with a little twist):
 ```anchor ExampleEqRw
 example : ∀ x y : A, x = y → PP y → PP x := by
   intro x y eq p
@@ -482,7 +479,7 @@ We can use classical logic in predicate logic even though the
 explanation using truth tables does not scale well. Think of them as
 "infinite truth tables."
 
-There are predicate-logic counterparts of de Morgan’s laws, which say
+There are predicate-logic counterparts of de Morgan’s laws, which say
 that you can move negation through a quantifier by negating the
 component and switching the quantifier.
 
@@ -507,8 +504,8 @@ This direction does not require classical logic.
 
 ## Second de Morgan law (needs classical logic)
 
-We need *reductio ad absurdum* (`raa`), which depends on excluded middle.
-Now the de Morgan law:
+We need *reductio ad absurdum* (`byContradiction`), which depends on excluded middle.
+Now the de Morgan law:
 
 ```anchor ExampleDm2Pred
 theorem dm2Pred {A : Type} {PP : A → Prop} :
@@ -531,7 +528,7 @@ theorem dm2Pred {A : Type} {PP : A → Prop} :
         apply na
 ```
 
-We needed `raa` twice in the first direction.
+We needed `byContradiction` twice in the first direction.
 
 ## Intuition
 
