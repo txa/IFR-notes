@@ -1,6 +1,7 @@
-import Content.ClassicalProofs
-import Mathlib.Tactic
-open ClassicalProofs
+--import Content.ClassicalProofs
+--import Mathlib.Tactic
+--open ClassicalProofs
+notation "ℕ" => Nat
 
 variable {P Q R : Prop}
 
@@ -16,6 +17,8 @@ def foo : ℕ → ℕ → ℕ
 | m , n => m + n + n
 -- ANCHOR_END: ExampleFuns
 
+axiom n : ℕ
+--axiom (a : ℕ) (b : Bool)
 -- ANCHOR: ExampleFuns2
 def double' (n : ℕ) : ℕ
 := n + n
@@ -82,7 +85,7 @@ example :
   intro p pq
   cases p with
   | intro a pa =>
-    use a
+    exists a
     apply pq
     apply pa
 -- ANCHOR_END: ExampleExists
@@ -98,24 +101,24 @@ example :
       cases ha with
       | inl pa =>
           apply Or.inl
-          use a
+          exists a
           -- exact pa, not needed
       | inr qa =>
           apply Or.inr
-          use a
+          exists a
           -- exact qa, not needed
   · intro h
     cases h with
     | inl hp =>
         cases hp with
         | intro a pa =>
-          use a
+          exists a
           apply Or.inl
           exact pa
     | inr hq =>
         cases hq with
         | intro a qa =>
-          use a
+          exists a
           apply Or.inr
           exact qa
 -- ANCHOR_END: ExampleExOr
@@ -127,7 +130,7 @@ theorem curryPred :
   · intro ppr
     intro a p
     apply ppr
-    use a
+    exists a
   · intro ppr
     intro pp
     cases pp with
@@ -183,7 +186,7 @@ example : ∀ x y : A, x = y → y = x := by
 
 example : ∀ x y z : A, x = y → y = z → x = z := by
   intro x y z xy yz
-  trans
+  apply Eq.trans
   exact xy
   exact yz
 -- ANCHOR_END: ExampleEqTacs
@@ -216,6 +219,8 @@ theorem dm1_pred {A : Type} {PP : A → Prop} :
         apply h
         apply pa
 -- ANCHOR_END: ExampleDm1Pred
+
+open Classical
 
 -- ANCHOR: ExampleDm2Pred
 theorem dm2Pred {A : Type} {PP : A → Prop} :
