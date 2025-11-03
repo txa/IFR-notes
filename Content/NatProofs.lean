@@ -61,3 +61,44 @@ induction n with
     dsimp [double,half]
     rw [ih]
 -- ANCHOR_END: halfDouble
+
+def add : ℕ → ℕ → ℕ
+| m  , zero     => m
+| m  , (succ n) => succ (add m n)
+
+
+theorem add_rneutr : ∀ n : ℕ, n + 0 = n := by
+intro n
+rfl
+
+theorem add_lneutr : ∀ n : ℕ, 0 + n  = n := by
+intro n
+induction n with
+ | zero => rfl
+ | succ m ih =>
+      change succ (0 + m) = succ m
+      rw [ih]
+
+example : ∀ n : ℕ, 0 + n  = n := by
+intro n
+induction n with
+ | zero => rfl
+ | succ m ih =>
+     calc 0 + (m + 1)
+          = (0 + m) + 1 := by rfl
+          _ = m + 1 := by rw [ih]
+
+theorem add_assoc : ∀ l m n : ℕ , (l + m) + n = l + (m + n) := by
+intro l m n
+induction n with
+| zero => rfl
+| succ n' ih =>
+     change succ (l + m + n') = succ (l + (m + n'))
+     rw [ih]
+
+theorem add_succ :
+∀ l m : ℕ, (succ l) + m = succ (l + m) := by
+sorry
+
+theorem add_comm :
+∀ l m : ℕ, l + m = m + l := by

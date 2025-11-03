@@ -323,7 +323,7 @@ example :
   | intro a pa =>
     constructor
     apply pq
-    apply pa
+    assumption
 ```
 After `constructor` we are in the following state (ignoring the assumptions inroduced by `variable`):
 ```
