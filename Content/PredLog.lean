@@ -96,7 +96,7 @@ has a different meaning to the proposition before.
 It is important to understand bound variables, essentially they work
 like scoped variables in programming. We can shadow variables as in
 `∀ x:A , (∃ x : A , PP x) ∧ QQ x`, here the `x` in  `PP x`
-refers to `∃ x : A`$ while the `x` in `QQ x` refers to `∀ x :
+refers to `∃ x : A` while the `x` in `QQ x` refers to `∀ x :
 A`. Bound variables can be consistently renamed, hence the previous
 proposition is the same as `∀ y:A , (∃ z : A , PP z) ∧ QQ y`, which
 is actually preferable since shadowing variables should be avoided
@@ -207,7 +207,7 @@ and then I can proof `PP a` by using `cases` on `pq`.
 # The existential quantifier
 
 To prove a proposition of the form `∃ x : A , PP x` it is enough to
-prove `PP a` for some `a : A`. We say `use a` and are left to prove `PP a`. But beware `use` is actually quite clever and will automatically prove `PP a` if it matches an assumption.
+prove `PP a` for some `a : A`. We say `exists a` and are left to prove `PP a`.
 
 On the other hand to use an assumption of the form
 `h : ∃ x : A ,  P x` we are using
@@ -238,7 +238,7 @@ example :
   intro p pq
   cases p with
   | intro a pa =>
-    use a
+    exists a
     apply pq
     apply pa
 ```
@@ -249,14 +249,14 @@ After the `intro` we are in the following state::
   pq : ∀ (y : A), PP y → QQ y
   ⊢ ∃ (z : A), QQ z
 ```
-We first take `p` apart using `cases`::
+We first take `p` apart using `cases`:
 ```
   pq : ∀ (y : A), PP y → QQ y,
   a : A,
   pa : PP a
   ⊢ ∃ (z : A), QQ z
 ```
-and now we can use `use a`. We are left with
+and now we can use `exists a`. We are left with
 ```
 pq : ∀ (y : A), PP y → QQ y
 a : A
@@ -287,28 +287,87 @@ example :
     | intro a ha =>
       cases ha with
       | inl pa =>
-          apply Or.inl
-          use a
+          left
+          exists a
           -- exact pa, not needed
       | inr qa =>
-          apply Or.inr
-          use a
+          right
+          exists a
           -- exact qa, not needed
   · intro h
     cases h with
     | inl hp =>
         cases hp with
         | intro a pa =>
-          use a
-          apply Or.inl
+          exists a
+          left
           exact pa
     | inr hq =>
         cases hq with
         | intro a qa =>
-          use a
-          apply Or.inr
+          exists a
+          right
           exact qa
 ```
+
+## Use `constructor` for `∃`
+
+There is an alternative to `exists` to prove `∃` which shows the similarity of `∃` and `∧`: we can use `constructor` to prove `exists`. Let's revisit our first example
+```anchor ExampleExistsConstr
+example :
+    (∃ x : A, PP x) →
+    (∀ y : A, PP y → QQ y) →
+    ∃ z : A , QQ z := by
+  intro p pq
+  cases p with
+  | intro a pa =>
+    constructor
+    apply pq
+    apply pa
+```
+After `constructor` we are in the following state (ignoring the assumptions inroduced by `variable`):
+```
+case intro.h
+pq : ∀ (y : A), PP y → QQ y
+a : A
+pa : PP a
+⊢ QQ ?intro.w
+case intro.w
+pq : ∀ (y : A), PP y → QQ y
+a : A
+pa : PP a
+⊢ A
+```
+Indeed we have two goals: the 2nd one is finding the witness an element of `A` which is displayed as `⊢ A` and the first one is to show that `QQ` holds for that witness which is `QQ ?intro.w` where `?intro.w` refers to the other yet incomplete goal. Instead of finding a witness first (as with `exists`) we just try to prove `QQ ?intro.w` and hope that the other goal gets instantiated automtically. Which is what happens because after `apply pq` we see
+```
+pq : ∀ (y : A), PP y → QQ y
+a : A
+pa : PP a
+⊢ PP ?intro.w
+```
+and once we prove this using `assumption` lean will use `pa` nd hence knows that `?intro.w` nust be `a`. So this goal gets discharged utomatically.
+
+This is clearly better because it saves us ti have to construct the witness manually. However, some care is in place when using `constructor`. We may try to postpone the `cases` until the end
+```
+example (A : Type) (PP QQ : A → Prop) :
+    (∃ x : A, PP x) →
+    (∀ y : A, PP y → QQ y) →
+    ∃ z : A , QQ z := by
+  intro p pq
+  constructor
+  apply pq
+  cases p with
+    | intro a pa =>
+        assumption
+```
+Before the last step we are in the following state
+```
+pq : ∀ (y : A), PP y → QQ y
+a : A
+pa : PP a
+⊢ PP (?m.27 ⋯)
+```
+but `assumption` fails because the weird looking `PP (?m.27 ⋯)` cannot be instantiated with `a`. The problem has to do with scope we have introduced the goal `⊢ A` *before* we introduced `a` when doing `cases`. Indeed the situation is similar as with `∧` where we would replicate code if we do `cases` later. However, here doing things in the wrong order means it is impossible to complete the proof.
 
 # Another Currying equivalence
 
@@ -346,7 +405,7 @@ theorem curryPred :
   · intro ppr
     intro a p
     apply ppr
-    use a
+    exists a
   · intro ppr
     intro pp
     cases pp with
@@ -435,7 +494,7 @@ example : ∀ x y : A, x = y → y = x := by
 
 example : ∀ x y z : A, x = y → y = z → x = z := by
   intro x y z xy yz
-  trans
+  apply transEq
   exact xy
   exact yz
 ```
@@ -553,7 +612,7 @@ Here is the summary of basic tactics for predicate logic:
   * `apply h`
 *
   * `∃`
-  * `use a`
+  * `exists a` / `constructor`
   * `cases h with | intro x p => …`
 *
   * `=`

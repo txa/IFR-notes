@@ -90,6 +90,19 @@ example :
     apply pa
 -- ANCHOR_END: ExampleExists
 
+-- ANCHOR: ExampleExistsConstr
+example :
+    (∃ x : A, PP x) →
+    (∀ y : A, PP y → QQ y) →
+    ∃ z : A , QQ z := by
+  intro p pq
+  cases p with
+  | intro a pa =>
+    constructor
+    apply pq
+    assumption
+-- ANCHOR_END: ExampleExistsConstr
+
 -- ANCHOR: ExampleExOr
 example :
     (∃ x : A, PP x ∨ QQ x) ↔
@@ -100,11 +113,11 @@ example :
     | intro a ha =>
       cases ha with
       | inl pa =>
-          apply Or.inl
+          left
           exists a
           -- exact pa, not needed
       | inr qa =>
-          apply Or.inr
+          right
           exists a
           -- exact qa, not needed
   · intro h
@@ -113,13 +126,13 @@ example :
         cases hp with
         | intro a pa =>
           exists a
-          apply Or.inl
+          left
           exact pa
     | inr hq =>
         cases hq with
         | intro a qa =>
           exists a
-          apply Or.inr
+          right
           exact qa
 -- ANCHOR_END: ExampleExOr
 
@@ -186,7 +199,7 @@ example : ∀ x y : A, x = y → y = x := by
 
 example : ∀ x y z : A, x = y → y = z → x = z := by
   intro x y z xy yz
-  apply Eq.trans
+  apply transEq
   exact xy
   exact yz
 -- ANCHOR_END: ExampleEqTacs

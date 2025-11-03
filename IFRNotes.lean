@@ -6,7 +6,8 @@ import Content.Intro
 import Content.PropLog
 import Content.Classical
 import Content.PredLog
--- import Content.Bool
+import Content.Bool
+import Content.Nat
 -- {include 1 Intro}
 -- {include 1 PropLog}
 -- {include 1 Classical}
@@ -36,3 +37,5 @@ authors := ["Thorsten Altenkirch"]
 {include 1 PropLog}
 {include 1 Classical}
 {include 1 PredLog}
+{include 1 Bool}
+{include 1 Nat}
