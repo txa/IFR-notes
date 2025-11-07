@@ -140,3 +140,51 @@ and we can rewrite with `oh` which solves the goal (`rfl` is applied automatical
 This is a very simple inductive proof, but it shows the general idea. Because every number is finitely generated from `zero` and `succ`, we can *run* an inductive proof for any number by repeating the inductive step as many times as there are `succ`s.
 
 Induction is the main workhorse for proving properties of inductive types like `ℕ`.
+
+# Addition and its properties
+
+While addition is an operation which you may have learned already in
+kindergarten, it still needs to be defined. And, horror, its definition
+already uses recursion — they don't tell the kids this in kindergarten!
+
+Here is Lean's definition of addition :
+```anchor add
+def add : ℕ → ℕ → ℕ
+| m  , zero     => m
+| m  , (succ n) => succ (add m n)
+```
+add m n` applies `n` successors to `m`. We define `m + n` as
+`add m n`. For example:
+
+```
+3 + 2
+= add 3 2
+= add 3 (succ 1)
+= succ (add 3 1)
+= succ (add 3 (succ 0))
+= succ (succ (add 3 0))
+= succ (succ (add 3 zero))
+= succ (succ 3)
+= 5
+```
+
+Lean also introduces the usual notation that `m + n` is defined as `add m n`.
+
+Lean defines addition by recursion over the second argument. While it
+might seem more natural to recurse over the first argument, the result
+is the same because addition is commutative (`m + n = n + m`), as we
+will show soon. We will stick with Lean’s convention for now.
+
+Now, what are the basic algebraic properties of `+`?
+
+First of all, `0` is a *neutral element*, meaning `n + 0 = n` and
+`0 + n = n`. You might think we only need to prove one of them since
+addition is commutative, but we actually need both when proving
+commutativity. It turns out that one is trivial, while the other
+requires induction.
+
+
+
+
+The theorem `add_rneutr` (`n + 0 = n`) holds by definition of `add`.
+However, `add_lneutr` (`0 + n = n`) does require induction.
