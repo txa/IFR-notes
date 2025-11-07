@@ -263,7 +263,7 @@ a : A
 pa : PP a
 ⊢ QQ a
 ```
-which is esy to prove.
+which is easy to prove.
 
 As `∀` can be exchanged with `∧`, `∃` can be exchanged with
 `∨`. That is we are going to prove the following equivalence:

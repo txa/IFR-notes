@@ -62,9 +62,11 @@ induction n with
     rw [ih]
 -- ANCHOR_END: halfDouble
 
+-- ANCHOR: add
 def add : ℕ → ℕ → ℕ
 | m  , zero     => m
 | m  , (succ n) => succ (add m n)
+-- ANCHOR_END: add
 
 
 theorem add_rneutr : ∀ n : ℕ, n + 0 = n := by
