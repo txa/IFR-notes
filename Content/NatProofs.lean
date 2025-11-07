@@ -96,9 +96,39 @@ induction n with
      change succ (l + m + n') = succ (l + (m + n'))
      rw [ih]
 
+example : ∀ l m n : ℕ , (l + m) + n = l + (m + n) := by
+intro l m n
+induction n with
+| zero => rfl
+| succ n' ih =>
+     calc  (l + m) + (succ n')
+         = succ ((l + m) +n') := by rfl
+      _  = succ (l + (m + n')) := by rw [ih]
+      _  = l + (succ (m + n')) := by rfl
+      _  = l + (m + (succ n')) := by rfl
+
 theorem add_succ :
 ∀ l m : ℕ, (succ l) + m = succ (l + m) := by
-sorry
+intro l m
+induction m with
+ | zero => rfl
+ | succ m ih =>
+     calc
+       (succ l) + (succ m)
+     = succ ((succ l ) + m) := by rfl
+       _ = succ (succ (l + m)) := by rw [ih]
+       _ = succ (l + succ m) := by rfl
 
 theorem add_comm :
 ∀ l m : ℕ, l + m = m + l := by
+intro l m
+induction m with
+| zero =>
+    calc l + 0
+        = l := by rfl
+      _ = 0 + l := by rw [add_lneutr]
+| succ n ih =>
+    calc l + (succ n)
+           = succ (l + n) := by rfl
+         _ = succ (n + l) := by rw[ih]
+         _ = (succ n) + l := by rw [← add_succ]
