@@ -141,3 +141,23 @@ induction m with
          _ = succ (m + l) := by rw[ih]
          _ = (succ m) + l := by rw [← add_succ]
 -- ANCHOR_END: add_comm
+
+-- ANCHOR: mult
+def mult : ℕ → ℕ → ℕ
+| _ , zero => zero
+| m , (succ n) => mult m n + m
+-- ANCHOR_END: mult
+
+-- ANCHOR: mult_cmon
+theorem mult_rneutr : ∀ n : ℕ, n * 1 = n := by sorry
+theorem mult_lneutr : ∀ n : ℕ, 1 * n  = n := by sorry
+theorem mult_assoc : ∀ l m n : ℕ , (l * m) * n = l * (m * n) := by sorry
+theorem mult_comm :  ∀ m n : ℕ , m * n = n * m := by sorry
+-- ANCHOR_END: mult_cmon
+
+-- ANCHOR: mult_distr
+theorem mult_lzero : ∀ n : ℕ , 0 * n = 0 := by sorry
+theorem mult_rzero : ∀ n : ℕ , n * 0 = 0 := by sorry
+theorem mult_ldistr :  ∀ l m n : ℕ , (m + n) * l = m * l + n * l := sorry
+theorem mult_rdistr :  ∀ l m n : ℕ , l * (m + n) = l * m + l * n := sorry
+-- ANCHOR_END: mult_distr

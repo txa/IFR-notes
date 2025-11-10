@@ -304,3 +304,74 @@ and for commutativity we need to establish
 ```
 Together with the previous results, we have now established that
 `ℕ` with `+` and `0` forms a *commutative monoid*.
+
+Mathematicians prefer it if you also have inverses as for the integers:
+for every integer `i : ℤ` there is `−i : ℤ` such that `i + (−i) = 0` and `(−i) + i = 0`. Such a structure is called a *group*. Note that subtraction is now a derived operation `i - j = i + (-j)`.
+
+# Multiplication and its properties
+
+We are proceeding slowly, and this time we will leave more of the fun to you.
+First, let’s define the idea of multiplication informally.
+
+As `+` is repeated successor, `*` is repeated addition. That is,
+`m*n` is `m` added `n` times. For example, `3*2` is `3 + 3 = 6`.
+```anchor mult
+def mult : ℕ → ℕ → ℕ
+| _ , zero => zero
+| m , (succ n) => mult m n + m
+```
+
+And as usual we define `x * y` to stand for `mul x y`. As `+`
+was repeated `succ`, `*` is repeated `+`. That is `m * n` is
+`m` added `n` times, for example::
+
+```
+  3 * 2
+  = mul 3 2
+  = mul 3 (succ 1)
+  = mul 3 1 + 3
+  = mul 3 (succ 0) + 3
+  = mul 3 0 + 3 + 3
+  = 0 + 3 + 3
+  = 6
+```
+
+What are the properties of multiplication? First, it also forms a
+commutative monoid, with `1` now playing the role of `0` for addition — it is
+the neutral element for multiplication. The fundamental properties to prove are:
+
+
+
+```anchor mult_cmon
+theorem mult_rneutr : ∀ n : ℕ, n * 1 = n := by sorry
+theorem mult_lneutr : ∀ n : ℕ, 1 * n  = n := by sorry
+theorem mult_assoc : ∀ l m n : ℕ , (l * m) * n = l * (m * n) := by sorry
+theorem mult_comm :  ∀ m n : ℕ , m * n = n * m := by sorry
+```
+
+Proving these will certainly require the properties of addition that we have
+already established, and the order in which you prove them might differ from
+how they are listed here. You may also want to keep the next properties
+(distributivity and multiplication by zero) in mind as they interact with the
+proofs above.
+
+Apart from addition and multiplication both being commutative monoids,
+they also interact in an important way known as *distributivity*.
+For example, to simplify an expression of the form `x * (y + z)` you can
+“multiply out” to get `(x * y) + (x * z)`. There are also boundary cases with
+zero. Without assuming commutativity of multiplication, we want the symmetric
+statements as well. The key properties are:
+
+```anchor mult_distr
+theorem mult_lzero : ∀ n : ℕ , 0 * n = 0 := by sorry
+theorem mult_rzero : ∀ n : ℕ , n * 0 = 0 := by sorry
+theorem mult_ldistr :  ∀ l m n : ℕ , (m + n) * l = m * l + n * l := sorry
+theorem mult_rdistr :  ∀ l m n : ℕ , l * (m + n) = l * m + l * n := sorry
+```
+
+The structure consisting of two monoids together with these distributivity
+laws (and with addition commutative) is called a *semiring*.
+When multiplication is commutative as well, we have a *commutative semiring*.
+Rings and semirings are central in algebra and closely related to polynomials
+(expressions like `7*x^2 + x + 5`, possibly with higher exponents and several
+variables).
