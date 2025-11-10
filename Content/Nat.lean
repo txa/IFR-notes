@@ -106,13 +106,17 @@ Here `half` replaces every two `succ`s by one.
 
 Proof by induction is very closely related to structural recursion. It is basically the same idea, but for proofs. As an example, let's actually prove that `half` is the inverse of `double`:
 ```anchor halfDouble
-example : ∀ n : ℕ , half (double n) = n := by
+theorem half_double :
+  ∀ n : ℕ, half (double n) = n := by
 intro n
 induction n with
- | zero => rfl
- | succ m ih =>
-    dsimp [double,half]
-    rw [ih]
+| zero => rfl
+| succ n ih =>
+    calc
+      half (double (succ n))
+      = half (succ (succ (double n))) := by rfl
+      _ = succ (half (double n)) := by rfl
+      _ = succ n := by rw [ih]
 ```
 After `intro n` we are in the following state:
 
@@ -129,17 +133,28 @@ ih : half (double m) = m
 ```
 This means that we can assume the statement for `m` when proving it for `succ m` (which is displayed as `m + 1`.)
 
-After simplyfying the goal using `dsimp [double,half]` we have
+We prove this in several steps using `calc`, staring with
 ```
-m : ℕ
-ih : half (double m) = m
-⊢ half (double m) + 1 = m + 1
+half (double (succ n))
 ```
-and we can rewrite with `oh` which solves the goal (`rfl` is applied automatically).
+we apply the definition of `double` (by saying `rfl`):
+```
+= half (succ (succ (double n))) := by rfl
+```
+and now the definition of `half` (again using `rfl`)
+```
+_ = succ (half (double n)) := by rfl
+```
+The `_` is just an indicator for lean that we are chaining equations.
+Now we have a term that matches the induction hypothesis and we can just rewrite:
+```
+_ = succ n := by rw [ih]
+```
+and we are done.
 
 This is a very simple inductive proof, but it shows the general idea. Because every number is finitely generated from `zero` and `succ`, we can *run* an inductive proof for any number by repeating the inductive step as many times as there are `succ`s.
 
-Induction is the main workhorse for proving properties of inductive types like `ℕ`.
+Induction is the main workhorse for proving properties of inductive types like `ℕ`. Try to fully understand the idea by looking at the simple proof above!
 
 # Addition and its properties
 
@@ -153,9 +168,8 @@ def add : ℕ → ℕ → ℕ
 | m  , zero     => m
 | m  , (succ n) => succ (add m n)
 ```
-add m n` applies `n` successors to `m`. We define `m + n` as
+`add m n` applies `n` successors to `m`. We define `m + n` as
 `add m n`. For example:
-
 ```
 3 + 2
 = add 3 2
@@ -183,8 +197,110 @@ addition is commutative, but we actually need both when proving
 commutativity. It turns out that one is trivial, while the other
 requires induction.
 
-
-
-
 The theorem `add_rneutr` (`n + 0 = n`) holds by definition of `add`.
+```anchor add_rneutr
+theorem add_rneutr : ∀ n : ℕ, n + 0 = n := by
+intro n
+rfl
+```
+
 However, `add_lneutr` (`0 + n = n`) does require induction.
+```anchor add_lneutr
+theorem add_lneutr : ∀ n : ℕ, 0 + n  = n := by
+intro n
+induction n with
+ | zero => rfl
+ | succ m ih =>
+     calc 0 + (succ m)
+          = succ (0 + m)  := by rfl
+          _ = succ m := by rw [ih]
+```
+
+This asymmetry comes from the definition of `+` (`add`) by recursion over the 2nd argument. If we had defined it by recursion of the first it would be the other way around.
+
+Another important property of addition is that brackets don’t matter:
+`(l + m) + n = l + (m + n)`. This is called *associativity*.
+We again need induction, but the variable we choose for induction
+matters. Since addition is defined by matching on its second argument,
+we must perform induction on that argument (`n`).
+```anchor add_assoc
+theorem add_assoc : ∀ l m n : ℕ , (l + m) + n = l + (m + n) := by
+intro l m n
+induction n with
+| zero => rfl
+| succ n' ih =>
+     calc  (l + m) + (succ n')
+         = succ ((l + m) +n') := by rfl
+      _  = succ (l + (m + n')) := by rw [ih]
+      _  = l + (succ (m + n')) := by rfl
+      _  = l + (m + (succ n')) := by rfl
+```
+
+In the base case (`n = 0`), both sides reduce to `l + m`.
+In the successor case, we are able to push through `succ` on both sides (using jsut the definition of `+`) to be able to apply the induction hypothesis.
+
+We have now shown the following facts about `+` and `0`:
+
+* `0` is right neutral: `n + 0 = n` (`add_rneutr`),
+* `0` is left neutral: `0 + n = n` (`add_lneutr`),
+* `+` is associative: `(l + m) + n = l + (m + n)` (`add_assoc`).
+
+Such a structure is called a *monoid*.
+(If you look up "monoid" on Wikipedia, don’t be distracted by the
+philosophical concept of the same name!)
+
+However, we have not yet discussed *commutativity* (`l + m = m + l`) , which isn’t
+required for a monoid.
+
+To prove commutativity, it isn't clear on which variable to do induction because both appear in different positions. So we may as well do induction on the second (`m`) so that the left hand side reduces. The zero case can be proven using `l_neutr` which but the successor case is more difficult: our induction hypothesis is `ih : l + m = m + l` and we want to show `l + succ m = succ m + l`. We reason:
+```
+        l + (succ m)
+           = succ (l + m) := by rfl
+```
+and now we can already apply the induction hypothesis:
+```
+         _ = succ (m + l) := by rw[ih]
+```
+but how do we bridge the gap to `succ (m + l)`? This is a common situation when proving theorems, which is a bit like using stepping stones to cross a stream. We need to put an additional stone in which in this case is a *lemma* (i.e. an auxilliary theorem), which can be proven by induction:
+```anchor add_succ
+theorem add_succ :
+∀ l m : ℕ, (succ l) + m = succ (l + m) := by
+intro l m
+induction m with
+ | zero => rfl
+ | succ m ih =>
+     calc
+       (succ l) + (succ m)
+         = succ ((succ l ) + m) := by rfl
+       _ = succ (succ (l + m)) := by rw [ih]
+       _ = succ (l + succ m) := by rfl
+```
+We can now use our *stepping stone* to prove commutativity:
+```anchor add_comm
+theorem add_comm :
+∀ l m : ℕ, l + m = m + l := by
+intro l m
+induction m with
+| zero =>
+    calc l + 0
+        = l := by rfl
+      _ = 0 + l := by rw [add_lneutr]
+| succ m ih =>
+      calc   l + (succ m)
+           = succ (l + m) := by rfl
+         _ = succ (m + l) := by rw[ih]
+         _ = (succ m) + l := by rw [← add_succ]
+```
+
+The lemmas we needed to prove commutativity of addition are just the mirror image of the equation which follow from the definition, that is by definition we have that
+```
+m + 0 = m
+m + (succ n) = succ (m + n)
+```
+and for commutativity we need to establish
+```
+0 + m = m
+(succ m) + n = succ (m + b)
+```
+Together with the previous results, we have now established that
+`ℕ` with `+` and `0` forms a *commutative monoid*.

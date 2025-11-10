@@ -52,7 +52,7 @@ def half : ℕ → ℕ
 | succ (succ n) => succ (half n)
 -- ANCHOR_END: half
 
--- ANCHOR: halfDouble
+
 example : ∀ n : ℕ , half (double n) = n := by
 intro n
 induction n with
@@ -60,6 +60,20 @@ induction n with
  | succ m ih =>
     dsimp [double,half]
     rw [ih]
+
+
+-- ANCHOR: halfDouble
+theorem half_double :
+  ∀ n : ℕ, half (double n) = n := by
+intro n
+induction n with
+| zero => rfl
+| succ n ih =>
+    calc
+      half (double (succ n))
+      = half (succ (succ (double n))) := by rfl
+      _ = succ (half (double n)) := by rfl
+      _ = succ n := by rw [ih]
 -- ANCHOR_END: halfDouble
 
 -- ANCHOR: add
@@ -68,37 +82,25 @@ def add : ℕ → ℕ → ℕ
 | m  , (succ n) => succ (add m n)
 -- ANCHOR_END: add
 
-
+-- ANCHOR: add_rneutr
 theorem add_rneutr : ∀ n : ℕ, n + 0 = n := by
 intro n
 rfl
+-- ANCHOR_END: add_rneutr
 
+-- ANCHOR: add_lneutr
 theorem add_lneutr : ∀ n : ℕ, 0 + n  = n := by
 intro n
 induction n with
  | zero => rfl
  | succ m ih =>
-      change succ (0 + m) = succ m
-      rw [ih]
+     calc 0 + (succ m)
+          = succ (0 + m)  := by rfl
+          _ = succ m := by rw [ih]
+-- ANCHOR_END: add_lneutr
 
-example : ∀ n : ℕ, 0 + n  = n := by
-intro n
-induction n with
- | zero => rfl
- | succ m ih =>
-     calc 0 + (m + 1)
-          = (0 + m) + 1 := by rfl
-          _ = m + 1 := by rw [ih]
-
+-- ANCHOR: add_assoc
 theorem add_assoc : ∀ l m n : ℕ , (l + m) + n = l + (m + n) := by
-intro l m n
-induction n with
-| zero => rfl
-| succ n' ih =>
-     change succ (l + m + n') = succ (l + (m + n'))
-     rw [ih]
-
-example : ∀ l m n : ℕ , (l + m) + n = l + (m + n) := by
 intro l m n
 induction n with
 | zero => rfl
@@ -108,7 +110,9 @@ induction n with
       _  = succ (l + (m + n')) := by rw [ih]
       _  = l + (succ (m + n')) := by rfl
       _  = l + (m + (succ n')) := by rfl
+-- ANCHOR_END: add_assoc
 
+-- ANCHOR: add_succ
 theorem add_succ :
 ∀ l m : ℕ, (succ l) + m = succ (l + m) := by
 intro l m
@@ -117,10 +121,12 @@ induction m with
  | succ m ih =>
      calc
        (succ l) + (succ m)
-     = succ ((succ l ) + m) := by rfl
+         = succ ((succ l ) + m) := by rfl
        _ = succ (succ (l + m)) := by rw [ih]
        _ = succ (l + succ m) := by rfl
+-- ANCHOR_END: add_succ
 
+-- ANCHOR: add_comm
 theorem add_comm :
 ∀ l m : ℕ, l + m = m + l := by
 intro l m
@@ -129,8 +135,9 @@ induction m with
     calc l + 0
         = l := by rfl
       _ = 0 + l := by rw [add_lneutr]
-| succ n ih =>
-    calc l + (succ n)
-           = succ (l + n) := by rfl
-         _ = succ (n + l) := by rw[ih]
-         _ = (succ n) + l := by rw [← add_succ]
+| succ m ih =>
+      calc   l + (succ m)
+           = succ (l + m) := by rfl
+         _ = succ (m + l) := by rw[ih]
+         _ = (succ m) + l := by rw [← add_succ]
+-- ANCHOR_END: add_comm
