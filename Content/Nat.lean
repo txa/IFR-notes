@@ -375,3 +375,222 @@ When multiplication is commutative as well, we have a *commutative semiring*.
 Rings and semirings are central in algebra and closely related to polynomials
 (expressions like `7*x^2 + x + 5`, possibly with higher exponents and several
 variables).
+
+# Some Algebra
+
+Once we know that multiplication and addition form a commutative ring, we can
+establish many familiar identities. For example, the binomial formula
+`(x + y)^2 = x^2 + 2·x·y + y^2`. To state this, we define exponentiation as
+repeated multiplication (just as multiplication is repeated addition).
+
+In practice, proving polynomial identities by hand can be tedious. Lean's mathlib provides automation in form of a `ring` tactic
+that can solve any equality that follows from the ring or semiring axioms by
+normalising expressions to a canonical polynomial form and comparing them.
+The important point is that the tactic still produces a proof from first
+principles — there is no “cheating,” only verified calculation.
+
+Here is a quick overview of standard number systems and their algebraic
+structures:
+
+- Natural numbers (`ℕ`): *Semiring*
+- Integers (`ℤ`): *Ring*
+- Rational numbers (`ℚ`): *Field*
+- Real numbers (`ℝ`): *Complete field*
+- Complex numbers (`ℂ`): *Algebraically complete field*
+
+A *ring* is a semiring with *additive inverses*: for every `x : ℤ` there is
+`-x : ℤ` such that `x + (-x) = 0` and `(-x) + x = 0`. Subtraction is not
+primitive but is defined by adding the additive inverse: `x - y := x + (-y)`.
+
+A *field* also has *multiplicative inverses* for all numbers different from
+`0`. The simplest example is the rational numbers (fractions). For every
+`p : ℚ` with `p ≠ 0` there is `p^{-1} : ℚ` such that `p · p^{-1} = 1` and
+`p^{-1} · p = 1`. For a fraction `(a/b) : ℚ` the multiplicative inverse is
+`(a/b)^{-1} = b/a`.
+
+The real numbers include numbers like `√2 : ℝ` and `π : ℝ`, and have the
+additional property that any convergent infinite sequence has a unique limit.
+The complex numbers include `i = √(-1) : ℂ` and have the additional feature
+that every polynomial equation has a solution (for example `x^2 + 1 = 0`);
+this is called *algebraic completeness*.
+
+# Ordering the numbers
+
+Next we look at the relation `≤`, which defines a *partial order* on the
+natural numbers. This time we are not going to use Lean's definition which uses an inductively defined relation (which we will cover later) but we define our own (equivalent) version which we write `≤'`
+
+We say that `m ≤' n` if there exists a number `k : ℕ` such
+that `n = k + m`.
+
+```anchor LE'
+def LE' : Nat → Nat → Prop
+| m , n => ∃ k : ℕ , k + m = n
+
+infix:50 " ≤' " => LE'
+```
+A *partial order* is a relation that is
+
+- *Reflexive*: for all `x`, `x ≤' x`,
+- *Transitive*: for all `x, y, z`, `x ≤' y` and `y ≤ 'z` imply `x ≤' z`,
+- *Antisymmetric*: for all `x, y`, `x ≤' y` and `y ≤' x` imply `x = y`.
+
+It is not hard to prove reflexivity and transitivity for the definition above
+(reflexivity with `k = 0`, transitivity by adding the “differences” and using
+associativity).
+
+```anchor refl_LE'
+theorem refl_LE' : ∀ n : ℕ, n ≤' n := by
+intro n
+exists 0
+apply add_lneutr
+```
+
+```anchor trans_LE'
+theorem trans_LE' : ∀ l m n : ℕ, l ≤' m → m ≤' n → l ≤' n := by
+intro l m n
+intro lm mn
+cases lm with
+| intro k klm =>
+    cases mn with
+    | intro j jmn =>
+        exists j + k
+        calc j + k + l
+             = j + (k + l) := by rw [add_assoc]
+            _ = j + m := by rw [klm]
+            _ = n := by assumption
+```
+
+
+Antisymmetry takes a bit more work and benefits from a few
+auxilliary lemmas — a good exercise.
+
+```anchor anti_sym_LE'
+theorem anti_sym_LE' : ∀ l m : ℕ , l ≤' m → m ≤' l → m = l := by
+sorry
+```
+
+We can define `<` by `m < n` iff `m + 1 ≤ n`.
+
+```anchor LT'
+def LT' : ℕ → ℕ → Prop
+| m , n => m+1 ≤' n
+
+infix:50 " <' " => LT'
+```
+
+I will not discuss `<` in detail here: it is antireflexive
+(*for all* `n`, *not* `n < n`), transitive, and strictly antisymmetric
+(`m < n` and `n < m` implies `False`). Two key properties of `<` are:
+
+- *Well-foundedness*: any strictly descending chain (for example
+  `10 > 5 > 3 > 0`) eventually terminates. This property underpins proofs of
+  termination for algorithms that are not primitive recursive.
+- *Trichotomy*: for any two numbers `m, n`, exactly one of `m < n`,
+  `m = n`, or `n < m` holds.
+
+A relation that is transitive, trichotomous, and well-founded is called a
+*well-order*. Well-orders are very useful; there is a famous theorem by
+Cantor that every set can be well-ordered. This is equivalent to the axiom of choice and not accepted in intuitionism (it implies excluded middle), and no explicit well-ordering of
+the real numbers is known.
+
+# Decidability
+
+Equality for natural numbers is *decidable*: there is an algorithm that, given
+`m, n : ℕ`, determines whether `m = n`. This can be implemented as a function:
+```anchor eq_ℕ
+def eq_ℕ : ℕ → ℕ → Bool
+| zero , zero => true
+| zero , succ n => false
+| succ m , zero => false
+| succ m , succ n => eq_ℕ m n
+```
+
+We claim that `eq_ℕ` decides equality that is `m = n ↔ eq_ℕ m n = true` for any `m n : ℕ`. We are now going to prove this. To show the left to right direction it is sufficient to show that `eq_ℕ` is reflexive.
+
+```anchor refl_eq_ℕ
+theorem refl_eq_ℕ : ∀ n : ℕ, eq_ℕ n n = true := by
+intro n
+induction n with
+| zero => rfl
+| succ n ih => calc
+    eq_ℕ (n + 1) (n + 1) =
+    eq_ℕ n n := by rfl
+    _ = true := by rw [ih]
+```
+
+Using rewriting this implies the left to right implication:
+```anchor equal2eq
+theorem equal2eq : ∀ m n : ℕ, m = n → eq_ℕ m n = true := by
+intro m n mn
+calc
+  eq_ℕ m n
+  = eq_ℕ m m := by rw [mn]
+  _ = true := by rw [refl_eq_ℕ]
+```
+
+The left to right direction is more interesting. A first attempt fails:
+
+```anchor eq2equal_bad
+example : ∀ m n : ℕ, eq_ℕ m n = true → m = n := by
+intro m n mn
+induction m with
+| zero =>
+    cases n with
+    | zero => rfl
+    | succ n' => cases mn
+| succ m' ih =>
+    cases n with
+    | zero => cases mn
+    | succ n' => sorry
+```
+
+We get into the following state
+```
+m' n' : ℕ
+ih : eq_ℕ m' (n' + 1) = true → m' = n' + 1
+mn : eq_ℕ (m' + 1) (n' + 1) = true
+⊢ m' + 1 = n' + 1
+```
+
+We need to apply `ih` for `n'` and not `n' + 1`. this is q common situation with induction proofs we have to make sure that our induction hypothesis is general enough. In this case this can be easily achieved by delaying the `intro`s so that the induction hypothesis applies to all `n`.
+```anchor eq2equal
+theorem eq2equal : ∀ m n : ℕ, eq_ℕ m n = true → m = n := by
+intro m
+induction m with
+| zero =>
+    intro n mn
+    cases n with
+    | zero => rfl
+    | succ n' => cases mn
+| succ m' ih =>
+    intro n mn
+    cases n with
+    | zero => cases mn
+    | succ n' =>
+        have h : m' = n' := by
+          apply ih
+          calc
+            eq_ℕ m' n'
+              = eq_ℕ (succ m') (succ n') := by rfl
+            _ = true := by rw [mn]
+        rw [h]
+```
+
+Now we can package everything up and prove that `eq_ℕ` decides equality:
+```anchor dec_eq_ℕ
+theorem dec_eq_ℕ : ∀ m n : ℕ, m = n ↔ eq_ℕ m n = true := by
+intro m n
+constructor
+. apply equal2eq
+. apply eq2equal
+```
+
+We say that equality of natural numbers is *decidable*. Not every predicate or relationis decidable, a famous example wihich we will see in the next semester is the *Halting problem*. However, there are simpler examples, eg equality on functions on natural numbers cannot be decided. A positive example is the relation `≤'` which is decidable. I leave this as an exercise.
+
+```anchor dec_le'_ℕ
+def le'_ℕ : ℕ → ℕ → Bool
+:= sorry
+
+theorem dec_le'_ℕ : ∀ m n : ℕ, m ≤' n ↔ le'_ℕ m n = true
+:= by sorry
+```
