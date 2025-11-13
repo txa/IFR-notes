@@ -1,5 +1,5 @@
 namespace NatProofs
-
+set_option tactic.customEliminators false -- to stop lean using +1
 namespace NatDef
 
 -- ANCHOR: NatDef
@@ -82,6 +82,10 @@ def add : ℕ → ℕ → ℕ
 | m  , (succ n) => succ (add m n)
 -- ANCHOR_END: add
 
+--infixl:65 " + " => add
+--notation:65 m:arg "+" n:arg => add m n
+notation:65 (priority := 1001) m:65 "+" n:66 => add m n
+
 -- ANCHOR: add_rneutr
 theorem add_rneutr : ∀ n : ℕ, n + 0 = n := by
 intro n
@@ -143,11 +147,14 @@ induction m with
 -- ANCHOR_END: add_comm
 
 -- ANCHOR: mult
-def mult : ℕ → ℕ → ℕ
+def mul : ℕ → ℕ → ℕ
 | _ , zero => zero
-| m , (succ n) => mult m n + m
+| m , (succ n) => mul m n + m
 -- ANCHOR_END: mult
 
+notation:70 (priority := 1001) a:70 " * " b:71 => mul a b
+
+namespace mult_distr_ex
 -- ANCHOR: mult_cmon
 theorem mult_rneutr : ∀ n : ℕ, n * 1 = n := by sorry
 theorem mult_lneutr : ∀ n : ℕ, 1 * n  = n := by sorry
@@ -161,23 +168,110 @@ theorem mult_rzero : ∀ n : ℕ , n * 0 = 0 := by sorry
 theorem mult_ldistr :  ∀ l m n : ℕ , (m + n) * l = m * l + n * l := sorry
 theorem mult_rdistr :  ∀ l m n : ℕ , l * (m + n) = l * m + l * n := sorry
 -- ANCHOR_END: mult_distr
+end mult_distr_ex
 
--- ANCHOR: LE'
-def LE' : Nat → Nat → Prop
+theorem mult_rneutr : ∀ n : Nat, n * 1 = n := by
+  intro n
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    calc
+      (n' + 1) * 1 = n'*1 + 1*1 := by rfl
+      _ = n' + 1*1 := by rw [ih]
+
+theorem mult_lneutr : ∀ n : Nat, 1 * n = n := by
+  intro n
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    calc
+      1 * (n' + 1) = 1 * n' + 1 * 1 := by rfl
+      _ = n' + 1 * 1 := by rw [ih]
+
+-- Anything multiplied by 0 is 0
+theorem mult_zero_r : ∀ n : Nat , n * 0 = 0 := by
+  intro n
+  rfl
+
+theorem mult_zero_l : ∀ n : Nat , 0 * n = 0 := by
+  intro n
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    calc
+      0 * (n' + 1) = 0 * n' + 0 := by rfl
+      _ = 0 * n' := by rw [add_rneutr]
+      _ = 0 := by rw [ih]
+
+-- Multiplication distributes over addition
+theorem mult_distr_r :  ∀ l m n : Nat, l * (m + n) = (l * m) + (l * n) := by
+  intro l m n
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    calc
+      l * (m + (n' + 1)) = l * (m + n' + 1) := by rfl
+      _ = l * ((m + n') + 1) := by rfl
+      _ = l * (m + n') + l := by rfl
+      _ = l * m + l * n' + l := by rw[ih]
+      _ = l * m + (l * n' + l) := by rw [add_assoc]
+
+theorem mult_distr_l :  ∀ l m n : Nat , (m + n) * l = (m * l) + (n * l) := by
+  intro l m n
+  induction l with
+  | zero => rfl
+  | succ l' ih =>
+    calc
+      (m + n) * (l' + 1) = (m + n) * l' + (m + n) := by rfl
+      _ = m * l' + n * l' + (m + n) := by rw [ih]
+      _ = m * l' + n * l' + m + n := by rw [← add_assoc]
+      _ = m * l' + (n * l' + m) + n := by rw [← add_assoc]
+      _ = (m * l' + (m + n * l')) + n := by rw [add_comm m]
+      _ = ((m * l' + m) + n * l') + n  := by rw [← add_assoc (m * l')]
+      _ = (m * l' + m) + (n * l' + n) := by rw [add_assoc]
+      _ = m * (l' + 1) + n * (l' + 1) := by rfl
+
+
+-- Multiplication is associative
+theorem mult_assoc : ∀ l m n : Nat , (l * m) * n = l * (m * n) := by
+  intro l m n
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    calc
+      l * m * (n' + 1) = l * m * n' + l * m := by rfl
+      _ = l * (m * n') + l * m := by rw[ih]
+      _ = l * (m * n' + m) := by rw [mult_distr_r]
+
+-- And also commutative
+theorem mult_comm :  ∀ m n : Nat , m * n = n * m := by
+  intro m n
+  induction m with
+  | zero => apply mult_zero_l
+  | succ m' ih =>
+    calc
+      (m' + 1) * n = m'*n + 1*n := by rw [mult_distr_l]
+      _ = n * m' + 1 * n := by rw [ih]
+      _ = n * m' + n := by rw [mult_lneutr]
+
+
+
+-- ANCHOR: LE
+def LE : Nat → Nat → Prop
 | m , n => ∃ k : ℕ , k + m = n
 
-infix:50 " ≤' " => LE'
--- ANCHOR_END: LE'
+infix:50 (priority := 1001) " ≤ " => LE
+-- ANCHOR_END: LE
 
--- ANCHOR: refl_LE'
-theorem refl_LE' : ∀ n : ℕ, n ≤' n := by
+-- ANCHOR: refl_LE
+theorem refl_LE : ∀ n : ℕ, n ≤ n := by
 intro n
 exists 0
 apply add_lneutr
--- ANCHOR_END: refl_LE'
+-- ANCHOR_END: refl_LE
 
--- ANCHOR: trans_LE'
-theorem trans_LE' : ∀ l m n : ℕ, l ≤' m → m ≤' n → l ≤' n := by
+-- ANCHOR: trans_LE
+theorem trans_LE : ∀ l m n : ℕ, l ≤ m → m ≤ n → l ≤ n := by
 intro l m n
 intro lm mn
 cases lm with
@@ -189,14 +283,14 @@ cases lm with
              = j + (k + l) := by rw [add_assoc]
             _ = j + m := by rw [klm]
             _ = n := by assumption
--- ANCHOR_END: trans_LE'
+-- ANCHOR_END: trans_LE
 
-namespace anti_sym_LE'_ex
--- ANCHOR: anti_sym_LE'
-theorem anti_sym_LE' : ∀ l m : ℕ , l ≤' m → m ≤' l → m = l := by
+namespace anti_sym_LE_ex
+-- ANCHOR: anti_sym_LE
+theorem anti_sym_LE : ∀ l m : ℕ , l ≤ m → m ≤ l → m = l := by
 sorry
--- ANCHOR_END: anti_sym_LE'
-end anti_sym_LE'_ex
+-- ANCHOR_END: anti_sym_LE
+end anti_sym_LE_ex
 
 theorem add_0 : ∀ x y : ℕ , x + y = y → x=0 := by
 intro x y h
@@ -207,7 +301,7 @@ induction y with
       _ = 0 := by assumption
 | succ y ih =>
     apply ih
-    have hh : succ (x + y) = y + 1 := by
+    have hh : succ (x + y) = succ y:= by
        rw [← h]
        rfl
     injection hh
@@ -221,7 +315,7 @@ cases y with
 | succ y =>
     cases h
 
-theorem anti_sym_LE' : ∀ l m : ℕ , l ≤' m → m ≤' l → m = l := by
+theorem anti_sym_LE : ∀ l m : ℕ , l ≤ m → m ≤ l → m = l := by
 intro l m lm ml
 cases lm with
 | intro k klm =>
@@ -243,17 +337,17 @@ cases lm with
            _ = l  := by rw [← jml]
 
 
--- ANCHOR: LT'
-def LT' : ℕ → ℕ → Prop
-| m , n => m+1 ≤' n
+-- ANCHOR: LT
+def LT : ℕ → ℕ → Prop
+| m , n => m+1 ≤ n
 
-infix:50 " <' " => LT'
--- ANCHOR_END: LT'
+infix:50 (priority := 1001) " < " => LT
+-- ANCHOR_END: LT
 
--- ANCHOR: trich_LT'
-theorem trich_LT' : ∀ m n : ℕ, m < n ∨ m = n ∨ n < m := by
+-- ANCHOR: trich_LT
+theorem trich_LT : ∀ m n : ℕ, m < n ∨ m = n ∨ n < m := by
 sorry
--- ANCHOR_END: trich_LT'
+-- ANCHOR_END: trich_LT
 
 -- ANCHOR: eq_ℕ
 def eq_ℕ : ℕ → ℕ → Bool
@@ -328,43 +422,43 @@ constructor
 . apply eq2equal
 -- ANCHOR_END: dec_eq_ℕ
 
-namespace dec_le'_ℕ_ex
--- ANCHOR: dec_le'_ℕ
-def le'_ℕ : ℕ → ℕ → Bool
+namespace dec_LE_ℕ_ex
+-- ANCHOR: dec_LE_ℕ
+def le_ℕ : ℕ → ℕ → Bool
 := sorry
 
-theorem dec_le'_ℕ : ∀ m n : ℕ, m ≤' n ↔ le'_ℕ m n = true
+theorem dec_LE_ℕ : ∀ m n : ℕ, m ≤ n ↔ le_ℕ m n = true
 := by sorry
--- ANCHOR_END: dec_le'_ℕ
-end dec_le'_ℕ_ex
+-- ANCHOR_END: dec_LE_ℕ
+end dec_LE_ℕ_ex
 
-def le'_ℕ : ℕ → ℕ → Bool
+def LE_ℕ : ℕ → ℕ → Bool
 | zero , n => true
 | succ m , zero => false
-| succ m , succ n => le'_ℕ m n
+| succ m , succ n => LE_ℕ m n
 
-theorem refl_le_ℕ : ∀ n : ℕ , le'_ℕ n n = true := by
+theorem refl_le_ℕ : ∀ n : ℕ , LE_ℕ n n = true := by
 intro n
 induction n with
 | zero => rfl
 | succ n ih => calc
-    le'_ℕ (n + 1) (n + 1) =
-    le'_ℕ n n := by rfl
+    LE_ℕ (n + 1) (n + 1) =
+    LE_ℕ n n := by rfl
     _ = true := by rw [ih]
 
-theorem nle0 : ∀ m : ℕ , ¬ m + 1 ≤' 0 := by
+theorem nle0 : ∀ m : ℕ , ¬ m + 1 ≤ 0 := by
 intro m h
 cases h with
 | intro j jm => cases jm
 
-theorem lePred : ∀ m n : ℕ , m + 1 ≤' n + 1 → m ≤' n := by
+theorem lePred : ∀ m n : ℕ , m + 1 ≤ n + 1 → m ≤ n := by
 intro m n mn
 cases mn with
 | intro j jmn =>
     exists j
     injection jmn
 
-theorem le2LE : ∀ m n : ℕ, m ≤' n → le'_ℕ m n := by
+theorem le2LE : ∀ m n : ℕ, m ≤ n → LE_ℕ m n := by
 intro m
 induction m with
 | zero =>
@@ -379,16 +473,16 @@ induction m with
           apply mn
         cases pcf
     | succ n =>
-        have h : le'_ℕ m n = true := by
+        have h : LE_ℕ m n = true := by
           apply ih
           apply lePred
           assumption
         calc
-          le'_ℕ (m + 1) (n + 1)
-            = le'_ℕ m n := by rfl
+          LE_ℕ (m + 1) (n + 1)
+            = LE_ℕ m n := by rfl
           _ = true := by rw [h]
 
-theorem LE2le : ∀ m n : ℕ, le'_ℕ m n → m ≤' n := by
+theorem LE2le : ∀ m n : ℕ, LE_ℕ m n → m ≤ n := by
 intro m
 induction m with
 | zero =>
@@ -399,11 +493,11 @@ induction m with
      cases n with
      | zero => cases mn
      | succ n =>
-         have h : m ≤' n := by
+         have h : m ≤ n := by
           apply ih
           calc
-            le'_ℕ m n
-              = le'_ℕ (m + 1) (n + 1) := by rfl
+            LE_ℕ m n
+              = LE_ℕ (succ m) (succ n) := by rfl
             _ = true := by rw [mn]
          cases h with
          | intro j jmn =>

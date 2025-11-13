@@ -316,9 +316,9 @@ First, let’s define the idea of multiplication informally.
 As `+` is repeated successor, `*` is repeated addition. That is,
 `m*n` is `m` added `n` times. For example, `3*2` is `3 + 3 = 6`.
 ```anchor mult
-def mult : ℕ → ℕ → ℕ
+def mul : ℕ → ℕ → ℕ
 | _ , zero => zero
-| m , (succ n) => mult m n + m
+| m , (succ n) => mul m n + m
 ```
 
 And as usual we define `x * y` to stand for `mul x y`. As `+`
@@ -417,36 +417,36 @@ this is called *algebraic completeness*.
 # Ordering the numbers
 
 Next we look at the relation `≤`, which defines a *partial order* on the
-natural numbers. This time we are not going to use Lean's definition which uses an inductively defined relation (which we will cover later) but we define our own (equivalent) version which we write `≤'`
+natural numbers. This time we are not going to use Lean's definition which uses an inductively defined relation (which we will cover later) but we define our own (equivalent) version.
 
-We say that `m ≤' n` if there exists a number `k : ℕ` such
+We say that `m ≤ n` if there exists a number `k : ℕ` such
 that `n = k + m`.
 
-```anchor LE'
-def LE' : Nat → Nat → Prop
+```anchor LE
+def LE : Nat → Nat → Prop
 | m , n => ∃ k : ℕ , k + m = n
 
-infix:50 " ≤' " => LE'
+infix:50 (priority := 1001) " ≤ " => LE
 ```
 A *partial order* is a relation that is
 
-- *Reflexive*: for all `x`, `x ≤' x`,
-- *Transitive*: for all `x, y, z`, `x ≤' y` and `y ≤ 'z` imply `x ≤' z`,
-- *Antisymmetric*: for all `x, y`, `x ≤' y` and `y ≤' x` imply `x = y`.
+- *Reflexive*: for all `x`, `x ≤ x`,
+- *Transitive*: for all `x, y, z`, `x ≤ y` and `y ≤ 'z` imply `x ≤ z`,
+- *Antisymmetric*: for all `x, y`, `x ≤ y` and `y ≤ x` imply `x = y`.
 
 It is not hard to prove reflexivity and transitivity for the definition above
 (reflexivity with `k = 0`, transitivity by adding the “differences” and using
 associativity).
 
-```anchor refl_LE'
-theorem refl_LE' : ∀ n : ℕ, n ≤' n := by
+```anchor refl_LE
+theorem refl_LE : ∀ n : ℕ, n ≤ n := by
 intro n
 exists 0
 apply add_lneutr
 ```
 
-```anchor trans_LE'
-theorem trans_LE' : ∀ l m n : ℕ, l ≤' m → m ≤' n → l ≤' n := by
+```anchor trans_LE
+theorem trans_LE : ∀ l m n : ℕ, l ≤ m → m ≤ n → l ≤ n := by
 intro l m n
 intro lm mn
 cases lm with
@@ -464,18 +464,18 @@ cases lm with
 Antisymmetry takes a bit more work and benefits from a few
 auxilliary lemmas — a good exercise.
 
-```anchor anti_sym_LE'
-theorem anti_sym_LE' : ∀ l m : ℕ , l ≤' m → m ≤' l → m = l := by
+```anchor anti_sym_LE
+theorem anti_sym_LE : ∀ l m : ℕ , l ≤ m → m ≤ l → m = l := by
 sorry
 ```
 
 We can define `<` by `m < n` iff `m + 1 ≤ n`.
 
-```anchor LT'
-def LT' : ℕ → ℕ → Prop
-| m , n => m+1 ≤' n
+```anchor LT
+def LT : ℕ → ℕ → Prop
+| m , n => m+1 ≤ n
 
-infix:50 " <' " => LT'
+infix:50 (priority := 1001) " < " => LT
 ```
 
 I will not discuss `<` in detail here: it is antireflexive
@@ -552,7 +552,7 @@ mn : eq_ℕ (m' + 1) (n' + 1) = true
 ⊢ m' + 1 = n' + 1
 ```
 
-We need to apply `ih` for `n'` and not `n' + 1`. this is q common situation with induction proofs we have to make sure that our induction hypothesis is general enough. In this case this can be easily achieved by delaying the `intro`s so that the induction hypothesis applies to all `n`.
+We need to apply `ih` for `n'` and not `n' + 1`. this is a common situation with induction proofs we have to make sure that our induction hypothesis is general enough. In this case this can be easily achieved by delaying the `intro`s so that the induction hypothesis applies to all `n`.
 ```anchor eq2equal
 theorem eq2equal : ∀ m n : ℕ, eq_ℕ m n = true → m = n := by
 intro m
@@ -585,12 +585,12 @@ constructor
 . apply eq2equal
 ```
 
-We say that equality of natural numbers is *decidable*. Not every predicate or relationis decidable, a famous example wihich we will see in the next semester is the *Halting problem*. However, there are simpler examples, eg equality on functions on natural numbers cannot be decided. A positive example is the relation `≤'` which is decidable. I leave this as an exercise.
+We say that equality of natural numbers is *decidable*. Not every predicate or relation is decidable, a famous example wihich we will see in the next semester is the *Halting problem*. However, there are simpler examples, eg equality on functions on natural numbers cannot be decided. A positive example is the relation `≤` which is decidable. I leave this as an exercise.
 
-```anchor dec_le'_ℕ
-def le'_ℕ : ℕ → ℕ → Bool
+```anchor dec_LE_ℕ
+def le_ℕ : ℕ → ℕ → Bool
 := sorry
 
-theorem dec_le'_ℕ : ∀ m n : ℕ, m ≤' n ↔ le'_ℕ m n = true
+theorem dec_LE_ℕ : ∀ m n : ℕ, m ≤ n ↔ le_ℕ m n = true
 := by sorry
 ```
