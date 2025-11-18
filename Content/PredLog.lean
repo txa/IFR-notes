@@ -122,7 +122,7 @@ If we have an assumption `h : ∀ x : A , PP x` and our current
 goal is `PP a` for some `a : A` then we can use `apply h` to
 prove our goal. Usually we have some combination of implication and forall like `h : ∀ x : A, PP x → QQ x` and now if our current goal is
 `QQ a` and we invoke `apply h` Lean will instantiate `x` with
-`a` and it remains to show `QQ a`.
+`a` and it remains to show `PP a`.
 
 Best to do some examples. Let's say we want to prove
 

@@ -585,7 +585,7 @@ constructor
 . apply eq2equal
 ```
 
-We say that equality of natural numbers is *decidable*. Not every predicate or relation is decidable, a famous example wihich we will see in the next semester is the *Halting problem*. However, there are simpler examples, eg equality on functions on natural numbers cannot be decided. A positive example is the relation `≤` which is decidable. I leave this as an exercise.
+We say that equality of natural numbers is *decidable*. Not every predicate or relation is decidable, a famous example which we will see in the next semester is the *Halting problem*. However, there are simpler examples, eg equality on functions on natural numbers cannot be decided. A positive example is the relation `≤` which is decidable. I leave this as an exercise.
 
 ```anchor dec_LE_ℕ
 def le_ℕ : ℕ → ℕ → Bool
