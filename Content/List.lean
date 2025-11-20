@@ -67,11 +67,13 @@ cases h
 ```
 We can use the injection tactic to prove the injectivity of cons in both arguments:
 ```anchor injCons
-theorem injCons_1 : ∀ a b : A, ∀ as bs : List A, a :: as = b :: bs → a = b := by
+theorem injCons_1 : ∀ a b : A, ∀ as bs : List A,
+  a :: as = b :: bs → a = b := by
 intro a b as bs h
 injection h
 
-theorem injCons_2 : ∀ a b : A, ∀ as bs : List A, a :: as = b :: bs → as = bs := by
+theorem injCons_2 : ∀ a b : A, ∀ as bs : List A,
+  a :: as = b :: bs → as = bs := by
 intro a b as bs h
 injection h
 ```
@@ -82,6 +84,16 @@ def tl : List A → List A
 | [] => []
 | _ :: as => as
 ```
+
+```anchor injCons_2
+theorem injCons_2' : ∀ a b : A, ∀ as bs : List A,
+  a :: as = b :: bs → as = bs := by
+intro a b as bs h
+change tl (a :: as) = bs
+rw [h]
+rfl
+```
+
 but it isn't so obvious what to do for `injCons_1` because we cannot complete the definition for `hd` (head) :
 ```anchor hd
 def hd : List A → A
@@ -114,7 +126,8 @@ def append : List A → List A → List A
 We adopt the usual notation writing `as ++ bs` for `append as bs`. Now we can state and prove the theorem that `length (as ++ bs)` is equal to `length as + length bs`.
 
 ```anchor length_append
-theorem length_append : ∀ as bs : List A , length (as ++ bs) = length as + length bs := by
+theorem length_append : ∀ as bs : List A ,
+  length (as ++ bs) = length as + length bs := by
 intro as bs
 induction as with
 | nil =>
@@ -138,7 +151,8 @@ This would be easier if addition and append would be defined by recursion over t
 Actually another approach would be to prove a different version of `length_append` which swaps the order and then use commutativity of `+` to derive the original theorem. I leave it as an exercise to complete the proof udsing list induction:
 
 ```anchor length_append'
-theorem length_append' : ∀ as bs : List A , length (as ++ bs) = length bs + length as :=
+theorem length_append' : ∀ as bs : List A ,
+  length (as ++ bs) = length bs + length as :=
 by sorry
 ```
 
@@ -156,7 +170,7 @@ induction. However, different from `+`, now left neutrality is easy
 because it follows from the definition:
 
 ```anchor app_lneutr
-theorem app_lneutr : forall as : List A, [] ++ as = as := by
+theorem app_lneutr : ∀ as : List A, [] ++ as = as := by
 intro as
 rfl
 ```
@@ -164,7 +178,7 @@ rfl
 But now right neutrality requires induction:
 
 ```anchor app_rneutr
-theorem app_rneutr : forall as : List A, as ++ [] = as := by
+theorem app_rneutr : ∀ as : List A, as ++ [] = as := by
 intro as
 induction as with
 | nil =>
@@ -190,7 +204,8 @@ first argument instead of the last - again this is caused by the fact
 that we now use recursion over the first instead of the 2nd argument.
 
 ```anchor app_assoc
-theorem app_assoc :  forall as bs cs : List A, (as ++ bs) ++ cs = as ++ (bs ++ cs) := by
+theorem app_assoc :
+∀ as bs cs : List A, (as ++ bs) ++ cs = as ++ (bs ++ cs) := by
 intro as bs cs
 induction as with
 | nil =>
@@ -211,3 +226,120 @@ Indeed `List A` with `++` and `[]` is the *free monoid* over
 `A` which intuitively means that only the monoid equations hold but no
 additional laws like commutativity. In this sense this monoid is free
 not to follow any laws apart from the monoid ones.
+
+# Reverse
+
+Since the list monoid is not commutative, order matters. In particular
+we can *reverse* a list. That is we are going to define a function
+which given a list like `[1,2,3]` produces the list with the
+elements in reverse order, in this case `[3,2,1]`.
+
+How do we reverse a list? Recursively! The reverse of the empty list
+is the empty list and the reverse of a list of the form `a :: l` is
+the reverse of `l` with `a` put in the end. So for example the
+reverse of `[1,2,3] = 1 :: [2,3]` is the reverse of `[2,3]`,
+i.e. `[3,2]` with `1` put at the end giving `[3,2,1]`.
+
+To define reverse we need an auxiliary operation which puts an
+element at the end. We call this operation `snoc` because it is the
+reverse of `cons`. We could define `snoc` using `++`, but for our
+purposes it is slightly more convenient to define it directly using recursion.
+
+```anchor snoc
+def snoc : List A → A → List A
+| [] , a => [a]
+| a :: as , b => a :: (snoc as b)
+```
+
+Using `snoc` we can define `rev`:
+
+```anchor rev
+def rev : List A → List A
+| [] => []
+| (a :: as) => snoc (rev as) a
+```
+
+A central property of `rev` is that it is self-inverse that is if we
+reverse a list twice we obtain the original list, e.g. `rev (rev
+[1,2,3])) = rev [3,2,1] = [1,2,3]`
+
+Ok, let's try and prove this using list induction:
+```anchor revrev_try
+theorem revrev : ∀ as : List A , rev (rev as) = as := by
+intro as
+induction as with
+| nil => rfl
+| cons a as ih =>
+  calc
+    rev (rev (a :: as))
+      = rev (snoc (rev as) a) := by rfl
+    _ = a :: rev (rev as) := by sorry
+    _ = a :: as := by rw [ih]
+```
+
+I get stuck in the proof: it is clear that I need to apply the induction hypothesis but we need to know that `rev (snoc (rev as) a) = a :: rev (rev as)` . We are in the situation that we want to cross a stream but there are not enough stepping stones. To avoid getting our feed wet we need to put in the right stepping stone.
+
+We cannot prove the equation we need directly but we can prove something more general by generalizing `rev as` to any list. That is we need to prove `rev (snoc as a) = a :: rev as` which is just the defining equation for `snoc` backwards. We can prove this by list induction:
+
+```anchor revsnoc
+theorem revsnoc : ∀ a : A, ∀ as : List A,
+  rev (snoc as a) = a :: rev as := by
+intro a as
+induction as with
+| nil => rfl
+| cons b as ih =>
+    calc
+      rev (snoc (b :: as) a)
+        = rev (b :: snoc as a) := by rfl
+      _ = snoc (rev (snoc as a)) b := by rfl
+      _ = snoc (a :: rev as) b := by rw [ih]
+      _ = a :: rev (b :: as) := by rfl
+```
+
+Using `revsnoc` we can complete `revrev`:
+```anchor revrev
+theorem revrev : ∀ as : List A , rev (rev as) = as := by
+intro as
+induction as with
+| nil => rfl
+| cons a as ih =>
+  calc
+    rev (rev (a :: as))
+      = rev (snoc (rev as) a) := by rfl
+    _ = a :: rev (rev as) := by rw [revsnoc]
+    _ = a :: as := by rw [ih]
+```
+This is a nice example about the art of proving which is a bit like
+putting stepping stones into a stream to cross it without getting wet
+feet. When getting stuck with our induction, then looking at the point
+where we are stuck often leads us to identifying another property
+which we can prove and which helps us to complete the original
+proof. There is no fixed method to identify a good auxiliary property
+(a lemma) it is a skill which improves by practice.
+
+Here is another problem to do with reverse which you can use to
+practice this skill: if you have attended Prof Hutton's Haskell course
+you will know that the above definition of reverse is very inefficient,
+indeed it has a quadratic complexity. A better definition is the
+following:
+
+```anchor fastrev
+def revaux : List A → List A → List A
+| [] , bs => bs
+| a :: as , bs => revaux as (a :: bs)
+
+def fastrev : List A → List A
+| l => revaux l []
+```
+
+`fastrev` only has linear complexity. However, we should convince
+ourselves that it behaves in the same way as `rev`, that is we
+should prove the following theorem:
+
+```anchor fastrev_thm
+theorem fastrev_thm : ∀ as : List A ,
+    fastrev as = rev as := by
+sorry
+```
+I leave it as an exercise to figure out what lemma(s) we need. Also it
+may be useful to employ some properties we have already proven.
