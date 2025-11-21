@@ -326,4 +326,103 @@ calc
   _ = rev as ++ [] := by rw [fastrev_lem]
   _ = rev as := by rw [app_rneutr]
 
+--- sort
+
+inductive Mem : A → List A → Prop
+| mem_hd : ∀ {a : A}, ∀ {as : List A}, Mem a (a :: as)
+| mem_tl : ∀ {a b : A}, ∀ {as : List A}, Mem a as → Mem a (b :: as)
+
+infix:50 (priority := 1001)" ∈ " => Mem
+
+open Mem
+
+inductive Sorted : List ℕ → Prop
+| sorted_nil : Sorted []
+| sorted_cons : ∀ {m : ℕ}, ∀ {ns : List ℕ},
+    Sorted ns → (∀ n : ℕ , n ∈ ns → m ≤ n)
+    → Sorted (m :: ns)
+
+open Sorted
+
+def insert : ℕ → List ℕ → List ℕ
+| n , [] => [n]
+| n , (m :: ms) =>
+    match le_ℕ n m with
+    | true => n :: m :: ms
+    | false => m :: insert n ms
+
+def sort : List ℕ → List ℕ
+| [] => []
+| (n :: ns) => insert n (sort ns)
+
+#eval sort [6,3,8,2,3]
+
+theorem le_lem : ∀ m n : ℕ , le_ℕ m n = false → n ≤ m := by
+intro m n mn
+cases h : le_ℕ m n with
+| true => rw [mn] at h
+          cases h
+| false => sorry
+
+
+theorem mem_mono :
+    ∀ m l k : ℕ, ∀ ns : List ℕ,
+    (∀ i : ℕ , i ∈ ns → m ≤ i)
+    → l ≤ m
+    → k ∈ ns
+    → l ≤ k := by sorry
+
+
+theorem insert_lem : ∀ m n i : ℕ , ∀ ns : List ℕ ,
+   m ≤ n → (∀ (j : ℕ), j ∈ ns → m ≤ j)
+   → i ∈ insert n ns → m ≤ i := by sorry
+
+theorem sorted_insert : ∀ ns : List ℕ, ∀ n : ℕ,
+  Sorted ns → Sorted (insert n ns) := by
+intro ns n sns
+induction ns with
+| nil =>
+    dsimp [insert]
+    apply sorted_cons
+    . apply sorted_nil
+    . intro k pcf
+      cases pcf
+| cons m ns ih =>
+    dsimp [insert]
+    cases b : le_ℕ n m with
+    | true =>
+        change Sorted (n :: m :: ns)
+        apply sorted_cons
+        . assumption
+        . cases sns with
+          | sorted_cons s h =>
+            intro k kmns
+            have nm : n ≤ m := by
+              apply le2LE
+              assumption
+            cases kmns with
+            | mem_hd => assumption
+            | mem_tl kns =>
+                apply mem_mono
+                . apply h
+                . assumption
+                . assumption
+    | false =>
+        change Sorted (m :: insert n ns)
+        cases sns with
+          | sorted_cons s h =>
+              apply sorted_cons
+              . apply ih
+                assumption
+              . have mn : m ≤ n := by sorry
+                intro i hi
+                apply insert_lem
+                . apply mn
+                . apply h
+                . assumption
+
+
+
+
+
 end ListProofs

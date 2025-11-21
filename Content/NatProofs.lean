@@ -432,18 +432,18 @@ theorem dec_LE_ℕ : ∀ m n : ℕ, m ≤ n ↔ le_ℕ m n = true
 -- ANCHOR_END: dec_LE_ℕ
 end dec_LE_ℕ_ex
 
-def LE_ℕ : ℕ → ℕ → Bool
+def le_ℕ : ℕ → ℕ → Bool
 | zero , n => true
 | succ m , zero => false
-| succ m , succ n => LE_ℕ m n
+| succ m , succ n => le_ℕ m n
 
-theorem refl_le_ℕ : ∀ n : ℕ , LE_ℕ n n = true := by
+theorem refl_le_ℕ : ∀ n : ℕ , le_ℕ n n = true := by
 intro n
 induction n with
 | zero => rfl
 | succ n ih => calc
-    LE_ℕ (n + 1) (n + 1) =
-    LE_ℕ n n := by rfl
+    le_ℕ (n + 1) (n + 1) =
+    le_ℕ n n := by rfl
     _ = true := by rw [ih]
 
 theorem nle0 : ∀ m : ℕ , ¬ m + 1 ≤ 0 := by
@@ -458,7 +458,7 @@ cases mn with
     exists j
     injection jmn
 
-theorem le2LE : ∀ m n : ℕ, m ≤ n → LE_ℕ m n := by
+theorem LE2le : ∀ m n : ℕ, m ≤ n → le_ℕ m n := by
 intro m
 induction m with
 | zero =>
@@ -473,16 +473,16 @@ induction m with
           apply mn
         cases pcf
     | succ n =>
-        have h : LE_ℕ m n = true := by
+        have h : le_ℕ m n = true := by
           apply ih
           apply lePred
           assumption
         calc
-          LE_ℕ (m + 1) (n + 1)
-            = LE_ℕ m n := by rfl
+          le_ℕ (m + 1) (n + 1)
+            = le_ℕ m n := by rfl
           _ = true := by rw [h]
 
-theorem LE2le : ∀ m n : ℕ, LE_ℕ m n → m ≤ n := by
+theorem le2LE : ∀ m n : ℕ, le_ℕ m n → m ≤ n := by
 intro m
 induction m with
 | zero =>
@@ -496,8 +496,8 @@ induction m with
          have h : m ≤ n := by
           apply ih
           calc
-            LE_ℕ m n
-              = LE_ℕ (succ m) (succ n) := by rfl
+            le_ℕ m n
+              = le_ℕ (succ m) (succ n) := by rfl
             _ = true := by rw [mn]
          cases h with
          | intro j jmn =>
@@ -506,3 +506,9 @@ induction m with
                j + (m + 1)
                  = (j + m) + 1 := by rfl
                _ = n + 1 := by rw [jmn]
+
+theorem dec_LE_ℕ : ∀ m n : ℕ, m ≤ n ↔ le_ℕ m n = true := by
+  intro m n
+  constructor
+  . apply LE2le
+  . apply le2LE
