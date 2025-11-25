@@ -357,25 +357,97 @@ def sort : List ℕ → List ℕ
 
 #eval sort [6,3,8,2,3]
 
-theorem le_lem : ∀ m n : ℕ , le_ℕ m n = false → n ≤ m := by
-intro m n mn
-cases h : le_ℕ m n with
-| true => rw [mn] at h
-          cases h
-| false => sorry
-
+theorem LE_lem : ∀ n m : ℕ, ¬ (m ≤ n) → n ≤ m := by
+  intro n
+  induction n with
+    intro m h
+    | zero =>
+        exists m
+    | succ n ih =>
+        cases m with
+        | zero =>
+            have pcf : False := by
+              apply h
+              exists succ n
+            cases pcf
+        | succ m =>
+            have hh : ¬ (m ≤ n) := by
+              intro mn
+              apply h
+              cases mn with
+              | intro k kmn =>
+                  exists k
+                  rw [← kmn]
+                  rfl
+            have nm : n ≤ m := by
+              apply ih
+              assumption
+            cases nm with
+            | intro j jnm =>
+                exists j
+                rw [← jnm]
+                rfl
 
 theorem mem_mono :
     ∀ m l k : ℕ, ∀ ns : List ℕ,
     (∀ i : ℕ , i ∈ ns → m ≤ i)
     → l ≤ m
     → k ∈ ns
-    → l ≤ k := by sorry
-
+    → l ≤ k := by
+    intro m l k ns h lm hh
+    induction hh with
+    | mem_hd =>
+        have nk : m ≤ k := by
+          apply h
+          apply mem_hd
+        apply trans_LE
+        apply lm
+        assumption
+    | mem_tl x ih =>
+        apply ih
+        intro i ii
+        apply h
+        apply mem_tl
+        assumption
 
 theorem insert_lem : ∀ m n i : ℕ , ∀ ns : List ℕ ,
    m ≤ n → (∀ (j : ℕ), j ∈ ns → m ≤ j)
-   → i ∈ insert n ns → m ≤ i := by sorry
+   → i ∈ insert n ns → m ≤ i :=
+   by
+    intro m n i ns mn h ins
+    induction ns with
+    | nil =>
+        dsimp [insert] at ins
+        cases ins with
+        | mem_hd =>
+            assumption
+        | mem_tl x =>
+            cases x
+    | cons k ns ih =>
+          dsimp [insert] at ins
+          cases b : le_ℕ n k with
+          | true =>
+              rw [b] at ins
+              cases ins with
+              | mem_hd =>
+                  assumption
+              | mem_tl x =>
+                  apply h
+                  assumption
+          | false =>
+              rw [b] at ins
+              cases ins with
+              | mem_hd =>
+                  apply h
+                  apply mem_hd
+              | mem_tl x =>
+                  apply ih
+                  intro j jns
+                  apply h
+                  apply mem_tl
+                  assumption
+                  assumption
+
 
 theorem sorted_insert : ∀ ns : List ℕ, ∀ n : ℕ,
   Sorted ns → Sorted (insert n ns) := by
@@ -414,15 +486,21 @@ induction ns with
               apply sorted_cons
               . apply ih
                 assumption
-              . have mn : m ≤ n := by sorry
+              . have mn : m ≤ n := by
+                  have nh : ¬ (n ≤ m) := by
+                    intro nm
+                    have lnm : le_ℕ n m = true := by
+                      apply LE2le
+                      assumption
+                    rw [b] at lnm
+                    cases lnm
+                  apply LE_lem
+                  assumption
                 intro i hi
                 apply insert_lem
                 . apply mn
                 . apply h
                 . assumption
-
-
-
 
 
 end ListProofs
