@@ -101,7 +101,7 @@ def hd : List A → A
 | a :: as => a
 end hd
 ```
-There is no defaullt element we can use to replace `sorry` - indeed the type `A` could be empty. I leave it as a challenge to prove `injCons_1` without using `injection`.
+There is no default element we can use to replace `sorry` - indeed the type `A` could be empty. I leave it as a challenge to prove `injCons_1` without using `injection`.
 
 # Induction for Lists
 
@@ -148,7 +148,7 @@ In the inductive step we are using the induction hypothesis `length (as ++ bs) =
 
 This would be easier if addition and append would be defined by recursion over the same argument but here we need to exploit the lemmas we needed to show commutativity of addition.
 
-Actually another approach would be to prove a different version of `length_append` which swaps the order and then use commutativity of `+` to derive the original theorem. I leave it as an exercise to complete the proof udsing list induction:
+Actually another approach would be to prove a different version of `length_append` which swaps the order and then use commutativity of `+` to derive the original theorem. I leave it as an exercise to complete the proof using list induction:
 
 ```anchor length_append'
 theorem length_append' : ∀ as bs : List A ,
@@ -343,3 +343,336 @@ sorry
 ```
 I leave it as an exercise to figure out what lemma(s) we need. Also it
 may be useful to employ some properties we have already proven.
+
+# Insertion sort
+
+Finally, we are going to look at a slightly more interesting
+algorithm: insertion-sort. Insertion-sort is quite an inefficient algorithm because it has quadratic complexity while the best sorting algorithms have a `n log n` complexity. However, insertion-sort is
+especially easy to implement and verify.
+
+To keep things simple I will only sort lists of natural numbers with respect to
+`≤ : ℕ → ℕ → Prop` using the fact that we have an implementation in
+the form of `le_ℕ : ℕ → ℕ → Bool` which decides `≤`.
+
+So our goal is to implement a function `sort : list ℕ → list ℕ` that
+sorts a given list, e.g. `sort [6,3,8,2,3] = [2, 3, 3, 6, 8]`.
+
+Insertion sort can be easily done with a deck of cards: you start with
+an unsorted deck and you take a card from the top each time and insert
+it at the appropriate position in the already sorted pile. Inserting a
+card means you have to go through the sorted pile until you find a
+card that is greater and then you insert it just before that. OK,
+there is also the special case that the sorted pile is empty in which
+case you just make a pile out of one card. Here is the recursive
+function implementing the algorithm:
+
+```anchor insert
+def insert : ℕ → List ℕ → List ℕ
+| n , [] => [n]
+| n , (m :: ms) =>
+    match le_ℕ n m with
+    | true => n :: m :: ms
+    | false => m :: insert n ms
+```
+
+Using `insert`  it is easy to implement `sort` by inserting one
+element after the other, starting with the empty list:
+
+```anchor sort
+def sort : List ℕ → List ℕ
+| [] => []
+| (n :: ns) => insert n (sort ns)
+```
+
+## Specifying `Sorted`
+
+To verify that the algorithm indeed sorts we need to specify what it
+means for a list to be sorted. That is we need to define a predicate
+`Sorted : List ℕ → Prop`. To define this we need to define an element relation for lists which we write `∈` to express that an element occurs in a list (e.g. `2 ∈ [1,2,3]`). This is similar to membership in a (finite) set and indeed in this is how membership is defined in the Lean library.
+
+To define these predicates we are going to use inductive definitions
+of predicates which are similar to the inductive datatypes we have already seen. The basic idea is that we state some rules how to prove the predicate like we used constructors for inductive types like
+`zero` , `succ` or `nil` and `cons`.
+
+## Membership
+
+Let's start with membership:
+```anchor Mem
+inductive Mem : A → List A → Prop
+| mem_hd : ∀ {a : A}, ∀ {as : List A},
+    ---------------
+    Mem a (a :: as)
+| mem_tl : ∀ {a b : A}, ∀ {as : List A},
+      Mem a as →
+      ---------------
+      Mem a (b :: as)
+```
+We write `a ∈ as` for `Mem a as`.
+
+The first constructor `mem_hd` (a rule without premises this is often called an axiom) tells us that an element is a member of list that starts with it, e.g. `2 ∈ [2,3]`. The 2nd constructor `mem_tl` tells s that if we know that an element appears in the tail of a list then it also appears in the cons, eg. using `2 ∈ [2,3]` we can show `2 ∈ [1,2,3]`.
+```anchor x2in123
+example : 2 ∈ [1,2,3] := by
+  apply mem_tl
+  apply mem_hd
+```
+
+
+Since this is an inductive definition we can also use `cases` and `induction` on `Mem`. For example we can show that there is no element in the empty list:
+
+```anchor mem_empty
+example : ∀ a : A , ¬ (a ∈ ([] : List A)) := by
+  intro a pcf
+  cases pcf
+```
+Note that we have to tell Lean that we want to consider `[]` to be an element of `List A` with the same `a` we are using in the quantifier. `pcf` stands for *pigs can fly*. This works because there is no way to use `mem_hd` or `mem_tl` to prove that there is an element of the empty list.
+
+We can also use cases to show that the elements of `[1,2]` are either `1` or `2`:
+```anchor mem12
+example : ∀ n : ℕ, n ∈ [1,2] → n = 1 ∨ n = 2 := by
+  intro n h
+  cases h with
+  | mem_hd =>
+      left
+      rfl
+  | mem_tl h' =>
+      cases h' with
+      | mem_hd =>
+          right
+          rfl
+      | mem_tl pcf =>
+          cases pcf
+```
+Note that we also use `cases pcf` in the end to show that there is no other possibility.
+
+## Sorted
+
+We specify the predicate `Sorted` also as an inductive predicate.
+
+```anchor Sorted
+inductive Sorted : List ℕ → Prop
+
+| sorted_nil :
+    ---------
+    Sorted []
+
+| sorted_cons : ∀ {m : ℕ}, ∀ {ns : List ℕ},
+    Sorted ns →
+    (∀ n : ℕ , n ∈ ns → m ≤ n)
+    --------------------------
+    → Sorted (m :: ns)
+```
+We specify that the empty list is sorted, and if you have a sorted list `ns` and you can show that all elements of `ns` are less than a new element `m` then also `m::ns` is sorted.
+
+As an example I show that `[1,2,3]` is sorted:
+```anchor Sorted123
+example : Sorted [1,2,3] := by
+  apply sorted_cons
+  . apply sorted_cons
+    . apply sorted_cons
+      . apply sorted_nil
+      . intro n h
+        cases h
+    . intro n h
+      cases h with
+      | mem_hd =>
+          apply le2LE
+          rfl
+      | mem_tl x => cases x
+  . intro n h
+    cases h with
+    | mem_hd =>
+        apply le2LE
+        rfl
+    | mem_tl hh =>
+       cases hh with
+       | mem_hd =>
+          apply le2LE
+          rfl
+       | mem_tl hhh => cases hhh
+```
+I am using
+```
+LE2le : ∀ m n : ℕ, m ≤ n → le_ℕ m n
+```
+to establish facts like `1 ≤ 3`. Indeed Lean defines a tactic `decide` which uses decidability to derive proofs. However, this doesn't work for our homegrown definitions.
+
+Yes this is a rather laborious proof for such a trivial fact. Nobody would do this by hand and indeed it isn't hard to see that `Sorted` is decidable. But in the end we don't want to decided wether something is sorted but we actually want to sort!
+
+## Verifying insertion sort
+
+Our goal is to verify that the output of insertion sort is a sorted list, that is we want to show:
+```anchor sort_sorts1
+theorem sort_sorts : ∀ ns: List ℕ, Sorted (sort ns) := by
+  sorry
+```
+
+It is not hard to see that we need to proceed by list induction and it is easy now to identify the main lemma about `insert`:
+```anchor sorted_insert
+theorem sorted_insert : ∀ ns : List ℕ, ∀ n : ℕ,
+  Sorted ns → Sorted (insert n ns) := by
+  sorry
+```
+
+Once we have established this lemma the rest is very straightforward:
+```anchor sort_sorts
+theorem sort_sorts : ∀ ns: List ℕ, Sorted (sort ns) := by
+  intro ns
+  induction ns with
+  | nil =>
+      apply sorted_nil
+  | cons n ns ih =>
+    dsimp [sort]
+    apply sorted_insert
+    assumption
+```
+
+The real challenge is to show `sorted_insert`. I found it quite laborious and I don't want to spoil the fun. Here are some hints
+- You will have to analyze the output of `le_ℕ n m` but just doing
+`cases le_ℕ n m` is useless, instead use `cases b : le_ℕ n m ` which adds assumptions `b : le_ℕ n m = true` and `le_ℕ n m = false` in each of the cases.
+- You need to show hat `¬ m ≤ n → n ≤ m` ie that the order is linear.
+- You need to prove some property of `∈` here is a lemma I found useful:
+```
+  (∀ a : A, PP a → QQ a)
+  → ∀ as : List A,
+    (∀ a : A, a ∈ as → PP a)
+    →
+    (∀ a : A, a ∈ as → QQ a)
+```
+where `PP QQ : A → Prop`.
+
+# Permutations
+
+Are we done now? Have we verified `sort`? That is, if you buy a tin and it says we have proven the theorem `sort_sorts`, are you then satisfied that the program `sort` does the job of sorting?
+
+Not so! We have missed one important aspect of `sort`, namely that the output should be a rearrangement, i.e. a *permutation* of the input. Otherwise an implementation of `sort` that always returns the empty list would be OK.
+
+We will specify the relation `Perm : List A → List A → Prop` which specifies that a list is permutation of another list, e.g. `Perm [1,2,2,3] [2,1,3,2]` holds but `Perm [1,2] [1,3]` or `Perm [1,2] [1,2,2]` do not. Our goal is to prove
+
+```anchor perm_sort_spec
+theorem perm_sort :
+  ∀ ns : List ℕ, Perm ns (sort ns) := by
+sorry
+```
+
+To define `Perm` we first define a relation `Insert : A → List A → List A → Prop` where `Insert a bs abs` means that `abs` is obtained by inserting `a` into `bs` at an arbitrary position, e.g. we have `Insert 2 [1,3] [1,2,3]`.
+```anchor Insert
+inductive Insert : A → List A → List A → Prop
+
+| ins_hd : ∀ {a:A}, ∀ {as : List A},
+
+    ---------------------
+    Insert a as (a :: as)
+
+| ins_tl : ∀ {a b:A}, ∀ {as as': List A},
+
+    Insert a as as' →
+    -----------------------------
+    Insert a (b :: as) (b :: as')
+```
+The idea is similar to `Mem`, we insert an element either in the beginning or somewhere in the tail. Here is a use case:
+
+```anchor Insert123
+example : Insert 2 [1,3] [1,2,3] := by
+  apply ins_tl
+  apply ins_hd
+```
+
+We now define `Perm` using `Insert`, basically the permutation of a fixed list can be obtained by inserting each element ast an arbitrary position:
+
+```anchor Perm
+inductive Perm : List A → List A → Prop
+| perm_nil :
+
+  ---------
+  Perm [] []
+
+| perm_cons : ∀ {a : A}, ∀ {as bs bs' : List A},
+
+  Perm as bs →
+  Insert a bs bs' →
+  -------------------
+  Perm (a :: as) bs'
+```
+
+Here is an example proving that `[3,2,1]` is a permutation of `[1,2,3]`:
+
+```anchor Perm123
+example : Perm [1,2,3] [3,2,1] := by
+  apply perm_cons
+  . apply perm_cons
+    . apply perm_cons
+      . apply perm_nil
+      . apply ins_hd
+    . apply ins_tl
+      apply ins_hd
+  . apply ins_tl
+    apply ins_tl
+    apply ins_hd
+```
+
+The proof that insertion sort produces a permutation is quite straightforward. First we show that `insert` actually inserts an element using the relation `Insert`:
+
+```anchor insert_inserts
+theorem insert_inserts : ∀ ns : List ℕ,∀ n : ℕ,
+  Insert n ns (insert n ns) := by
+  intro ns n
+  induction ns with
+  | nil =>
+      dsimp [insert]
+      apply ins_hd
+  | cons m ms ih =>
+      dsimp [insert]
+      cases le_ℕ n m with
+      | true =>
+          change Insert n (m :: ms) (n :: m :: ms)
+          apply ins_hd
+      | false =>
+          change Insert n (m :: ms) (m :: insert n ms)
+          apply ins_tl
+          assumption
+```
+
+Using this lemma we only need a straightforward list induction to show the main result:
+```anchor perm_sort
+theorem perm_sort :
+  ∀ ns : List ℕ, Perm ns (sort ns) := by
+  intro ns
+  induction ns with
+  | nil =>
+      dsimp [sort]
+      apply perm_nil
+  | cons n ns ih =>
+      dsimp [sort]
+      apply perm_cons
+      . apply ih
+      . apply insert_inserts
+```
+
+What are the properties of `Perm`? It is an equivalence relation, indeed reflexivity is easy to show:
+
+```anchor reflPerm
+theorem refl_perm : ∀ as : List A, Perm as as := by
+  intro as
+  induction as with
+  | nil => apply perm_nil
+  | cons a as ih =>
+      apply perm_cons
+      . apply ih
+      . apply ins_hd
+```
+
+The other two properties, symmetry and transitivity, are a bit harder and require some lemmas. Hence I leave them as an exercise:
+
+```anchor PermEq
+theorem sym_perm : ∀ as bs : List A,
+  Perm as bs → Perm bs as := by sorry
+
+theorem trans_perm : ∀ as bs cs ds : List A,
+  Perm as bs → Perm bs cs → Perm as ds := by sorry
+```
+
+Once you have proven them you may have a go at the following theorem:
+```anchor perm_tl
+theorem perm_tl : ∀ a : A, ∀ as bs : List A,
+  Perm (a :: as) (a :: bs) → Perm as bs := by sorry
+```

@@ -21,7 +21,8 @@ local infixr:67 "::" => List.cons
 
 end ListDef
 
-open List
+--open List
+open List hiding Perm perm_cons perm_nil
 
 #check cons 1 (cons 2 (cons 3 nil))
 #check 1 :: 2 :: 3 :: []
@@ -328,34 +329,111 @@ calc
 
 --- sort
 
-inductive Mem : A → List A → Prop
-| mem_hd : ∀ {a : A}, ∀ {as : List A}, Mem a (a :: as)
-| mem_tl : ∀ {a b : A}, ∀ {as : List A}, Mem a as → Mem a (b :: as)
 
-infix:50 (priority := 1001)" ∈ " => Mem
-
-open Mem
-
-inductive Sorted : List ℕ → Prop
-| sorted_nil : Sorted []
-| sorted_cons : ∀ {m : ℕ}, ∀ {ns : List ℕ},
-    Sorted ns → (∀ n : ℕ , n ∈ ns → m ≤ n)
-    → Sorted (m :: ns)
-
-open Sorted
-
+-- ANCHOR: insert
 def insert : ℕ → List ℕ → List ℕ
 | n , [] => [n]
 | n , (m :: ms) =>
     match le_ℕ n m with
     | true => n :: m :: ms
     | false => m :: insert n ms
+-- ANCHOR_END: insert
 
+-- ANCHOR: sort
 def sort : List ℕ → List ℕ
 | [] => []
 | (n :: ns) => insert n (sort ns)
+-- ANCHOR_END: sort
 
 #eval sort [6,3,8,2,3]
+
+-- ANCHOR: Mem
+inductive Mem : A → List A → Prop
+
+| mem_hd : ∀ {a : A}, ∀ {as : List A},
+    ---------------
+    Mem a (a :: as)
+
+| mem_tl : ∀ {a b : A}, ∀ {as : List A},
+      Mem a as →
+      ---------------
+      Mem a (b :: as)
+-- ANCHOR_END: Mem
+
+infix:50 (priority := 1001)" ∈ " => Mem
+
+open Mem
+
+-- ANCHOR: x2in123
+example : 2 ∈ [1,2,3] := by
+  apply mem_tl
+  apply mem_hd
+-- ANCHOR_END: x2in123
+
+-- ANCHOR: mem_empty
+example : ∀ a : A , ¬ (a ∈ ([] : List A)) := by
+  intro a pcf
+  cases pcf
+-- ANCHOR_END: mem_empty
+
+-- ANCHOR: mem12
+example : ∀ n : ℕ, n ∈ [1,2] → n = 1 ∨ n = 2 := by
+  intro n h
+  cases h with
+  | mem_hd =>
+      left
+      rfl
+  | mem_tl h' =>
+      cases h' with
+      | mem_hd =>
+          right
+          rfl
+      | mem_tl pcf =>
+          cases pcf
+-- ANCHOR_END: mem12
+
+-- ANCHOR: Sorted
+inductive Sorted : List ℕ → Prop
+
+| sorted_nil :
+    ---------
+    Sorted []
+
+| sorted_cons : ∀ {m : ℕ}, ∀ {ns : List ℕ},
+    Sorted ns →
+    (∀ n : ℕ , n ∈ ns → m ≤ n)
+    --------------------------
+    → Sorted (m :: ns)
+-- ANCHOR_END: Sorted
+
+open Sorted
+
+-- ANCHOR: Sorted123
+example : Sorted [1,2,3] := by
+  apply sorted_cons
+  . apply sorted_cons
+    . apply sorted_cons
+      . apply sorted_nil
+      . intro n h
+        cases h
+    . intro n h
+      cases h with
+      | mem_hd =>
+          apply le2LE
+          rfl
+      | mem_tl x => cases x
+  . intro n h
+    cases h with
+    | mem_hd =>
+        apply le2LE
+        rfl
+    | mem_tl hh =>
+       cases hh with
+       | mem_hd =>
+          apply le2LE
+          rfl
+       | mem_tl hhh => cases hhh
+-- ANCHOR_END: Sorted123
 
 theorem LE_lem : ∀ n m : ℕ, ¬ (m ≤ n) → n ≤ m := by
   intro n
@@ -387,6 +465,32 @@ theorem LE_lem : ∀ n m : ℕ, ¬ (m ≤ n) → n ≤ m := by
                 exists j
                 rw [← jnm]
                 rfl
+
+variable (PP QQ : A → Prop)
+
+theorem forall_mono :
+  (∀ a : A, PP a → QQ a)
+  → ∀ as : List A,
+    (∀ a : A, a ∈ as → PP a)
+    →
+    (∀ a : A, a ∈ as → QQ a) := by
+  intro pq as p a aas
+  induction as with
+  | nil => cases aas
+  | cons b bs ih =>
+      cases aas with
+      | mem_hd =>
+          apply pq
+          apply p
+          apply mem_hd
+      | mem_tl hh =>
+          apply ih
+          intro a abs
+          apply p
+          apply mem_tl
+          assumption
+          assumption
+
 
 theorem mem_mono :
     ∀ m l k : ℕ, ∀ ns : List ℕ,
@@ -502,5 +606,304 @@ induction ns with
                 . apply h
                 . assumption
 
+-- ANCHOR: sort_sorts
+theorem sort_sorts : ∀ ns: List ℕ, Sorted (sort ns) := by
+  intro ns
+  induction ns with
+  | nil =>
+      apply sorted_nil
+  | cons n ns ih =>
+    dsimp [sort]
+    apply sorted_insert
+    assumption
+-- ANCHOR_END: sort_sorts
+
+namespace sortspec1
+-- ANCHOR: sort_sorts1
+theorem sort_sorts : ∀ ns: List ℕ, Sorted (sort ns) := by
+  sorry
+-- ANCHOR_END: sort_sorts1
+end sortspec1
+
+namespace sortspec2
+-- ANCHOR: sort_sorts2
+theorem sort_sorts : ∀ ns: List ℕ, Sorted (sort ns) := by
+  intro ns
+  induction ns with
+  | nil =>
+      apply sorted_nil
+  | cons n ns ih =>
+    dsimp [sort]
+    sorry
+-- ANCHOR_END: sort_sorts2
+
+-- ANCHOR: sorted_insert
+theorem sorted_insert : ∀ ns : List ℕ, ∀ n : ℕ,
+  Sorted ns → Sorted (insert n ns) := by
+  sorry
+-- ANCHOR_END: sorted_insert
+
+end sortspec2
+
+-- Permutation
+
+namespace PermSpec
+
+axiom Perm : List A → List A → Prop
+
+-- ANCHOR: perm_sort_spec
+theorem perm_sort :
+  ∀ ns : List ℕ, Perm ns (sort ns) := by
+sorry
+-- ANCHOR_END: perm_sort_spec
+
+end PermSpec
+
+-- ANCHOR: Insert
+inductive Insert : A → List A → List A → Prop
+
+| ins_hd : ∀ {a:A}, ∀ {as : List A},
+
+    ---------------------
+    Insert a as (a :: as)
+
+| ins_tl : ∀ {a b:A}, ∀ {as as': List A},
+
+    Insert a as as' →
+    -----------------------------
+    Insert a (b :: as) (b :: as')
+-- ANCHOR_END: Insert
+
+open Insert
+
+-- ANCHOR: Insert123
+example : Insert 2 [1,3] [1,2,3] := by
+  apply ins_tl
+  apply ins_hd
+-- ANCHOR_END: Insert123
+
+-- ANCHOR: Perm
+inductive Perm : List A → List A → Prop
+| perm_nil :
+
+  ---------
+  Perm [] []
+
+| perm_cons : ∀ {a : A}, ∀ {as bs bs' : List A},
+
+  Perm as bs →
+  Insert a bs bs' →
+  -------------------
+  Perm (a :: as) bs'
+-- ANCHOR_END: Perm
+
+open Perm
+
+-- ANCHOR: Perm123
+example : Perm [1,2,3] [3,2,1] := by
+  apply perm_cons
+  . apply perm_cons
+    . apply perm_cons
+      . apply perm_nil
+      . apply ins_hd
+    . apply ins_tl
+      apply ins_hd
+  . apply ins_tl
+    apply ins_tl
+    apply ins_hd
+-- ANCHOR_END: Perm123
+
+#check Insert
+
+-- ANCHOR: insert_inserts
+theorem insert_inserts : ∀ ns : List ℕ,∀ n : ℕ,
+  Insert n ns (insert n ns) := by
+  intro ns n
+  induction ns with
+  | nil =>
+      dsimp [insert]
+      apply ins_hd
+  | cons m ms ih =>
+      dsimp [insert]
+      cases le_ℕ n m with
+      | true =>
+          change Insert n (m :: ms) (n :: m :: ms)
+          apply ins_hd
+      | false =>
+          change Insert n (m :: ms) (m :: insert n ms)
+          apply ins_tl
+          assumption
+-- ANCHOR_END: insert_inserts
+
+-- ANCHOR: perm_sort
+theorem perm_sort :
+  ∀ ns : List ℕ, Perm ns (sort ns) := by
+  intro ns
+  induction ns with
+  | nil =>
+      dsimp [sort]
+      apply perm_nil
+  | cons n ns ih =>
+      dsimp [sort]
+      apply perm_cons
+      . apply ih
+      . apply insert_inserts
+-- ANCHOR_END: perm_sort
+
+-- ANCHOR: reflPerm
+theorem refl_perm : ∀ as : List A, Perm as as := by
+  intro as
+  induction as with
+  | nil => apply perm_nil
+  | cons a as ih =>
+      apply perm_cons
+      . apply ih
+      . apply ins_hd
+-- ANCHOR_END: reflPerm
+
+namespace permProps
+
+-- ANCHOR: PermEq
+theorem sym_perm : ∀ as bs : List A,
+  Perm as bs → Perm bs as := by sorry
+
+theorem trans_perm : ∀ as bs cs ds : List A,
+  Perm as bs → Perm bs cs → Perm as ds := by sorry
+-- ANCHOR_END: PermEq
+
+theorem perm_tl : ∀ a : A, ∀ as bs : List A,
+  Perm (a :: as) (a :: bs) → Perm as bs := by sorry
+
+end permProps
+
+variable {as bs cs as' bs' cs' : List A}
+variable {a b : A}
+
+theorem add_lem : Insert a as bs → Insert b bs cs → ∃ ds : List A, Insert b as ds ∧ Insert a ds cs := by
+  intro h1 h2
+  induction h1 generalizing cs
+  case ins_hd a' =>
+    cases h2
+    case ins_hd =>
+      constructor
+      constructor
+      apply ins_hd
+      apply ins_tl
+      apply ins_hd
+
+    case ins_tl a' h1 =>
+      constructor
+      constructor
+      apply h1
+      apply Insert.ins_hd
+
+  case ins_tl a' b' as' as'' h1  =>
+    cases h2
+    case ins_hd =>
+      constructor
+      constructor
+      apply Insert.ins_hd
+      apply Insert.ins_tl
+      apply Insert.ins_tl
+      exact as''
+
+    case ins_tl ds h2' =>
+      cases h1 h2' with
+      | intro ds hh =>
+        cases hh with
+        | intro hh1 hh2 =>
+          constructor
+          constructor
+          apply Insert.ins_tl
+          apply hh1
+          apply Insert.ins_tl
+          apply hh2
+
+theorem transLem : Perm bs cs → Insert a bs' bs →
+  ∃ cs':List A, Perm bs' cs' ∧ Insert a cs' cs := by
+  intro h1 h2
+  induction h1 generalizing bs'
+  case perm_nil => cases h2
+  case perm_cons b as ds ds' h1 h2' ih =>
+    cases h2
+    case ins_hd =>
+      constructor
+      constructor
+      apply h1
+      apply h2'
+    case ins_tl xs h3 =>
+      cases ih h3 with
+      | intro ys hh =>
+        cases hh with
+        | intro h4 h5 =>
+          cases add_lem h5 h2' with
+          | intro zs hh' =>
+            cases hh' with
+            | intro h6 h7 =>
+              exists zs
+              constructor
+              apply perm_cons
+              apply h4
+              exact h6
+              exact h7
+
+theorem trans_perm : Perm as bs → Perm bs cs → Perm as cs := by
+  intro h1 h2
+  induction h1 generalizing cs
+  case perm_nil =>
+      cases h2
+      apply perm_nil
+  case perm_cons a xs ys zs h1' h ih =>
+      cases transLem  h2 h with
+      | intro ds' hh =>
+        cases hh with
+        | intro h3 h4 =>
+          apply perm_cons
+          apply ih h3
+          apply h4
+
+theorem sym_lem : Perm cs as → Insert a cs bs → Perm bs (a :: as) := by
+  intro h1 h2
+  induction h2 generalizing as
+  case ins_hd a =>
+    apply perm_cons
+    exact h1
+    apply ins_hd
+  case ins_tl c ys zs h3 ih =>
+    cases h1 with
+    | perm_cons h4 h5 =>
+      apply perm_cons
+      apply ih h4
+      apply ins_tl
+      exact h5
+
+theorem sym_perm : Perm as bs → Perm bs as := by
+  intro h
+  induction h
+  case perm_nil =>
+    apply Perm.perm_nil
+  case perm_cons a xs ys zs h1 h2 ih =>
+    apply sym_lem ih h2
+
+namespace perm_tl
+-- ANCHOR: perm_tl
+theorem perm_tl : ∀ a : A, ∀ as bs : List A,
+  Perm (a :: as) (a :: bs) → Perm as bs := by sorry
+-- ANCHOR_END: perm_tl
+end perm_tl
+
+theorem perm_tl : ∀ a : A, ∀ as bs : List A,
+  Perm (a :: as) (a :: bs) → Perm as bs := by
+  intro a as bs h
+  cases h
+  case perm_cons bs' h1 h2 =>
+    cases h2
+    case ins_hd => assumption
+    case ins_tl cs hi =>
+      apply trans_perm
+      apply h1
+      apply perm_cons
+      apply refl_perm
+      assumption
 
 end ListProofs

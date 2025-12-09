@@ -1,5 +1,5 @@
 name = "IFR notes"
-defaultrueargets = ["ifrnotes"]
+defaultTargets = ["ifrnotes"]
 
 [[require]]
 name = "verso"

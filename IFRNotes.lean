@@ -9,6 +9,7 @@ import Content.PredLog
 import Content.Bool
 import Content.Nat
 import Content.List
+import Content.Trees
 -- {include 1 Intro}
 -- {include 1 PropLog}
 -- {include 1 Classical}
@@ -41,3 +42,4 @@ authors := ["Thorsten Altenkirch"]
 {include 1 Bool}
 {include 1 Nat}
 {include 1 List}
+{include 1 Trees}
