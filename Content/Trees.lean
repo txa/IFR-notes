@@ -109,13 +109,13 @@ def eval : Expr → Env  → ℕ
 | times e1 e2 , env =>
     (eval e1 env) * (eval e2 env)
 ```
-We test `eval` with our exaple exression and environment leading to the expected outcome:
+We test `eval` with our example expression and environment leading to the expected outcome:
 ```anchor eval_ex
 #eval (eval e1 env0)
 #eval (eval e2 env0)
 ```
 
-We have defined an interpreter which provides a straightforward *denotational semantics* of our language. Next we provide a machine which can evaluate expression. The machine is a stackmachine which also accesses the environment which plays the role of a heap here. We define a type of instructions `Instr` and our `Code` is just a list of instructions.
+We have defined an interpreter which provides a straightforward *denotational semantics* of our language. Next we provide a machine which can evaluate expressions. The machine is a stack machine which also accesses the environment which plays the role of a heap here. We define a type of instructions `Instr` and our `Code` is just a list of instructions.
 ```anchor Instr
 inductive Instr : Type
 | pushC : ℕ → Instr
@@ -190,7 +190,7 @@ theorem compile_ok :
   eval e env = run (compile e) [] env := by sorry
 ```
 
-However, we will first reimplement the compiler using *continuation passing style* which is both more efficient and easier to verify because we avoid using `++` by passing the rest of the code (the continuation) as an argument. The idea is basically the same as for `fastrev`. It is easier to verify becuase since we avoid `++` we don't have to refer to the monoid laws of `List`. Here is the continuation passing version of the compiler which uses an auxiliary function:
+However, we will first reimplement the compiler using *continuation passing style* which is both more efficient and easier to verify because we avoid using `++` by passing the rest of the code (the continuation) as an argument. The idea is basically the same as for `fastrev`. It is easier to verify because since we avoid `++` we don't have to refer to the monoid laws of `List`. Here is the continuation passing version of the compiler which uses an auxiliary function:
 ```anchor compile_aux
 def compile_aux : Expr → Code → Code
 | const n , c => pushC n :: c

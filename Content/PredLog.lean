@@ -103,7 +103,7 @@ is actually preferable since shadowing variables should be avoided
 because it confuses the human reader.
 
 Now we have introduced all these variables what can we do with
-them. We have new primitive proposition:
+them. We have a new primitive proposition:
 
 * equality (`=`), given `a b : A` we write `a = b` which we read
   as `a` is equal to `b`.
