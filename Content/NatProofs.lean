@@ -1,5 +1,6 @@
 namespace NatProofs
 set_option tactic.customEliminators false -- to stop lean using +1
+set_option pp.fieldNotation false
 namespace NatDef
 
 -- ANCHOR: NatDef

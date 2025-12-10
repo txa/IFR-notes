@@ -2,6 +2,7 @@ import Content.NatProofs
 
 namespace ListProofs
 set_option tactic.customEliminators false -- to stop lean using +1
+set_option pp.fieldNotation false
 -- notation "ℕ" => Nat
 -- open Nat
 
