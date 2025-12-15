@@ -59,32 +59,145 @@ open Sorted_tree
 
 variable {A B C : Type}
 
-theorem mem_append : 
+open Mem
+
+theorem mem_append_1 :
   ∀ a : A, ∀ as bs : List A,
-  a ∈ as ++ bs → a ∈ as ∨ a ∈ bs := by sorry
+  a ∈ as ++ bs → a ∈ as ∨ a ∈ bs := by
+  intro a as bs
+  induction as with
+  | nil =>
+      intro h
+      right
+      apply h
+  | cons c cs ih =>
+      intro h
+      cases h with
+      | mem_hd =>
+          left
+          apply mem_hd
+      | mem_tl x =>
+          have h2 : a ∈ cs ∨ a ∈ bs := by
+            apply ih
+            assumption
+          cases h2 with
+          | inl h2l =>
+              left
+              apply mem_tl
+              assumption
+          | inr h2r =>
+              right
+              assumption
+
+theorem mem_append_2 :
+  ∀ a : A, ∀ as bs : List A,
+  a ∈ as ∨ a ∈ bs → a ∈ as ++ bs := by
+  intro a as bs
+  induction as with
+  | nil =>
+      intro h
+      cases h with
+      | inl hl =>
+          cases hl
+      | inr hr =>
+          apply hr
+  | cons c cs ih =>
+      intro h
+      cases h with
+        | inl hl =>
+            cases hl with
+            | mem_hd =>
+                apply mem_hd
+            | mem_tl x =>
+                apply mem_tl
+                apply ih
+                left
+                assumption
+        | inr hr =>
+            apply mem_tl
+            apply ih
+            right
+            assumption
 
 theorem add_lem : ∀ t : Tree, ∀ i n : ℕ,
-  i ∈ tree2list (add t n) → i ∈ tree2list t ∨ i = n := by 
+  i ∈ tree2list (add t n) → i ∈ tree2list t ∨ i = n := by
   intro t i n h
-  induction t with 
-  | leaf => 
-      cases h with 
-      | mem_hd => 
+  induction t with
+  | leaf =>
+      cases h with
+      | mem_hd =>
           right
           rfl
       | mem_tl pcf =>
           cases pcf
   | node l m r ihl ihr =>
       dsimp [add] at h
+      dsimp [tree2list]
       cases b : le_ℕ n m with
-      | true => 
+      | true =>
           rw [b] at h
           change i ∈ tree2list (add l n) ++ ([m]++ tree2list r )at h
-          have hh : i ∈ tree2list (add l n) ∨ i ∈ [m] ++ tree2list r := by sorry
-          cases hh with 
-          | inl iln => sorry
-          | inr imr => sorry
-      | false => sorry
+          have hh : i ∈ tree2list (add l n) ∨ i ∈ [m] ++ tree2list r := by
+            apply mem_append_1
+            assumption
+          cases hh with
+          | inl iln =>
+              have h3 : i ∈ tree2list l ∨ i = n := by
+                apply ihl
+                assumption
+              cases h3 with
+              | inl h3l =>
+                    left
+                    apply mem_append_2
+                    left
+                    assumption
+              | inr h3r =>
+                    right
+                    assumption
+          | inr imr =>
+              left
+              apply mem_append_2
+              right
+              assumption
+      | false =>
+          rw [b] at h
+          change i ∈ tree2list l ++ ([m]++ tree2list (add r n)) at h
+          have hh : i ∈ tree2list l ∨ i ∈ [m] ++ tree2list (add r n) := by
+            apply mem_append_1
+            assumption
+          cases hh with
+          | inl il =>
+              left
+              apply mem_append_2
+              left
+              assumption
+          | inr imr =>
+              have h3 : i ∈ [m] ∨ i ∈ tree2list (add r n) := by
+                apply mem_append_1
+                assumption
+              cases h3 with
+              | inl h3l =>
+                  left
+                  apply mem_append_2
+                  right
+                  apply mem_append_2
+                  left
+                  assumption
+              | inr h3r =>
+                  have h4 : i ∈ tree2list r ∨ i = n := by
+                    apply ihr
+                    assumption
+                  cases h4 with
+                    | inl h4l =>
+                        left
+                        apply mem_append_2
+                        right
+                        apply mem_append_2
+                        right
+                        assumption
+                    | inr h4r =>
+                        right
+                        assumption
 
 
 theorem sort_adds : ∀ t : Tree, ∀ n : ℕ,
@@ -111,21 +224,43 @@ theorem sort_adds : ∀ t : Tree, ∀ n : ℕ,
                 . apply ihl
                   assumption
                 . intro i h
-                  have hh : i ∈ tree2list l ∨ i = n := by 
+                  have hh : i ∈ tree2list l ∨ i = n := by
                     apply add_lem
                     assumption
                   cases hh with
-                  | inl il => 
+                  | inl il =>
                       apply hl
                       assumption
-                  | inr ir => 
+                  | inr ir =>
                       rw [ir]
-                      apply le2LE 
+                      apply le2LE
                       assumption
                 . assumption
                 . assumption
-            | false => sorry
-
+            | false =>
+                change Sorted_tree (node l m (add r n))
+                apply sorted_node
+                . assumption
+                . assumption
+                . apply ihr
+                  assumption
+                . intro i h
+                  have hh : i ∈ tree2list r ∨ i = n := by
+                    apply add_lem
+                    assumption
+                  cases hh with
+                  | inl il =>
+                      apply hr
+                      assumption
+                  | inr ir =>
+                      rw [ir]
+                      apply LE_lem
+                      intro nnm
+                      have nm : le_ℕ n m = true := by
+                        apply LE2le
+                        assumption
+                      rewrite [b] at nm
+                      cases nm
 
 theorem list2tree_sorts : ∀ ns : List ℕ,
     Sorted_tree (list2tree ns) := by
