@@ -145,10 +145,12 @@ example : (∀ x : A, PP x)
 ```
 Note that after `intro` the proof state is::
 
+```
   p : ∀ (x : A), PP x,
   pq : ∀ (y : A), PP y → QQ y,
   a : A
   ⊢ QQ a
+```
 
 That is the `x` in `QQ x` has been replaced by `a`. I could have
 used `x` again but I thought this may be misleading because you may

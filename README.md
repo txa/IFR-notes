@@ -10,3 +10,10 @@ open http://localhost:8000
 
 if anchors are stuck:
 rm -rf .lake/build/highlighted
+
+To generate a PDF via LaTeX, run:
+```
+lake exe cache get
+lake exe ifrnotes
+latexmk -cd -lualatex -interaction=nonstopmode _out/tex/main
+```
