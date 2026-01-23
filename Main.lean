@@ -15,13 +15,13 @@ open Std (HashMap)
 
 --open IFRNotes
 
-def config : Config where
+def config : RenderConfig where
   extraFiles := [("diagrams", "diagrams")]
-  emitTeX := false
-  emitHtmlSingle := false
-  emitHtmlMulti := true
+  emitTeX := true
+  emitHtmlSingle := .no
+  emitHtmlMulti := .immediately
   htmlDepth := 1
 
 --def main := manualMain (%doc IFRNotes) (extraSteps := [buildExercises]) (config := config)
 --def main := manualMain (%doc IFRNotes) (config := config)
-def main := manualMain (%doc IFRNotes) (config := config.addKaTeX)
+def main := manualMain (%doc IFRNotes) (config := config)

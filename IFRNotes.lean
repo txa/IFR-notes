@@ -31,10 +31,6 @@ authors := ["Thorsten Altenkirch"]
 %%%
 
 
-```comment
-{index}[notes] {comment}[only for index]
-
-```
 {include 1 Intro}
 {include 1 PropLog}
 {include 1 Classical}
