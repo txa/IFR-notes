@@ -273,34 +273,5 @@ theorem list2tree_sorts : ∀ ns : List ℕ,
       apply sort_adds
       assumption
 
--- theorem sort_adds : ∀ t : Tree, ∀ n : ℕ,
---   Sorted→ Sorted (tree2list (add t n)) := by
---   intro t n h
---   induction t with
---   | leaf =>
---       dsimp [add,tree2list]
---       change (Sorted (n :: []))
---       apply sorted_cons
---       apply sorted_nil
---       intro n pcf
---       cases pcf
---   | node l m r ihl ihr =>
---       dsimp [add]
---       cases b : le_ℕ n m with
---       | true =>
---           dsimp [tree2list]
---           sorry
---       | false => sorry
-
-
--- theorem sort_sorts : ∀ ns: List ℕ, Sorted (sort ns) := by
---   intro ns
---   induction ns with
---   | nil =>
---       apply sorted_nil
---   | cons n ms ih =>
---       dsimp [sort,list2tree]
---       apply sort_adds
---       apply ih
 
 end tree_sort
