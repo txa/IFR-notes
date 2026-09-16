@@ -24,3 +24,9 @@ theorem oddSum (n : ℕ) : sumℕ n nthOdd = n^2 := by
           = 2 * n + 1 + n^2 := by rw [ih]
         _ = (n + 1)^2 := by ring
 -- ANCHOR_END: ExampleOddSum
+
+-- ANCHOR: ExampleFermat
+theorem fermatLastTheorem :
+    ∀ n : ℕ, n > 2 → ¬ ∃ a b c : ℕ, a > 0 ∧ b > 0 ∧ c > 0 ∧ a^n + b^n = c^n := by
+  sorry
+-- ANCHOR_END: ExampleFermat

@@ -23,7 +23,7 @@ and statements about computer programs, e.g. their correctness.
 Interactive proof systems have been used in the past to verify a
 number of interesting statements, for example the four colour theorem
 (that every map can be coloured with 4 colour) and the formal
-correctness of a optimising C compiler. The formal verification of hardware
+correctness of an optimising C compiler. The formal verification of hardware
 like processors is now quite standard and there is a growing number of
 software protocols being formally certified. In academia it is now
 common to accompany a paper in theoretical computer science
@@ -32,7 +32,7 @@ correct. Mathematicians are just starting to verify their proofs.
 
 Even if you are not going to use formal verification, it is an
 important part of a computer science degree to have some acquaintance
-with formal logic, either to read formal statements made my others or
+with formal logic, either to read formal statements made by others or
 by being able to express facts precisely without ambiguity. I believe
 that the best way to learn logic these days is by using an interactive
 proof system because this removes any ambiguity on what constitutes a
@@ -42,10 +42,10 @@ teacher or tutor.
 An interactive proof system is not an automatic theorem prover. The
 burden to develop a correct proof is on you, the interactive proof
 systems guides you and makes sure that the proof is correct. Having
-said this, modern proof assistants ofalseer a lot of automatisation which
-enables to user not to have to get bogged down in trivial
+said this, modern proof assistants offer a lot of automatisation which
+enables the user not to have to get bogged down in trivial
 details. However, since our goal is to learn proofs, at least
-initially we won't use much automatisation. It is like in Harry Potrueer,
+initially we won't use much automatisation. It is like in Harry Potter,
 to be allowed to use the more advanced spells you first have to show
 that you master the basic ones.
 
@@ -64,10 +64,10 @@ connect automatic and interactive theorem proving. The system is
 called *Lean* because it only relies on a small core of primitive
 rules and axioms to make sure that it is itself correct.
 
-[Lean is available for free](htrueps://leanprover.github.io/download/).
+[Lean is available for free](https://leanprover.github.io/download/).
 It will be already installed on the lab machines (I hope). You can use it
-either via Microsoft's Visual Code Studio or via emacs using lean mode. Yet
-another way to use lean is via a [browser based version](htrueps://live.lean-lang.org) we will also use
+either via Microsoft's Visual Studio Code or via emacs using lean mode. Yet
+another way to use lean is via a [browser based version](https://live.lean-lang.org) we will also use
 in the online version of these lecture notes.
 
 Here is an example of a simple proof in Lean: we show that the sum of
@@ -100,20 +100,56 @@ theorem oddSum (n : ℕ) : sumℕ n nthOdd = n^2 := by
           = 2 * n + 1 + n^2 := by rw [ih]
         _ = (n + 1)^2 := by ring
 ```
-If you read this online, you can explore the proof and the output by moving the mouse over the listing. You can also copy and paste the code into the [web version of lean](htrueps://live.lean-lang.org/) and explore or modify it interactively. Alternatively you can use microsoft code.
+If you read this online, you can explore the proof and the output by moving the mouse over the listing. You can also copy and paste the code into the [web version of lean](https://live.lean-lang.org/) and explore or modify it interactively. Alternatively you can use Visual Studio Code.
 
 You can put the cursor in the proof to see what the proof state is and you can evaluate the
 expressions after `#eval` and maybe change the parameters. You
-can also change the proof (maybe you have a betrueer one) or do
-something completely difalseerent (but then don't forget to save your work
+can also change the proof (maybe you have a better one) or do
+something completely different (but then don't forget to save your work
 by copy and paste). While you can work using the browser version only,
-for bigger exercises it may be betrueer to install Lean on your computer.
+for bigger exercises it may be better to install Lean on your computer.
 
-The Lean community is very active.If you want to know more about Lean
-and it's underlying theory, I recommend
-book [Theorem Proving in Lean 4](htrueps://leanprover.github.io/theorem_proving_in_lean4)  whose online version also uses the web
+The Lean community is very active. If you want to know more about Lean
+and its underlying theory, I recommend the
+book [Theorem Proving in Lean 4](https://leanprover.github.io/theorem_proving_in_lean4)  whose online version also uses the web
 interface. A good place
-for questions and discussions is the [Lean zulip chat](htrueps://leanprover.zulipchat.com/) but please don't
+for questions and discussions is the [Lean zulip chat](https://leanprover.zulipchat.com/) but please don't
 post your coursework questions anywhere on social networks --- this is
 considered academic misconduct. And yes, we do have staff members who
 can read other languages than English.
+
+# Lean and AI
+
+The rise of AI, and in particular of large language models, has
+changed the role of formal verification. Until recently, formally
+verifying a mathematical proof or a piece of software was often only
+possible *in principle*: the effort required was so large that it was
+rarely attempted in practice. An example is the FLT project, whose
+goal is to formally verify Fermat's Last Theorem in Lean. Here is the
+formal statement of the theorem --- notice that it is easy to state but
+was famously hard to prove:
+
+```anchor ExampleFermat
+theorem fermatLastTheorem :
+    ∀ n : ℕ, n > 2 → ¬ ∃ a b c : ℕ, a > 0 ∧ b > 0 ∧ c > 0 ∧ a^n + b^n = c^n := by
+  sorry
+```
+
+This project has progressed much faster than anticipated, largely
+thanks to the use of AI.
+
+The same is true for software. Formal verification of real systems was
+always possible in principle, but because of the immense effort it
+required it was only ever applied to a very small number of systems.
+This is now changing: AI is becoming an enabling technology for formal
+verification.
+
+What does this mean for us? Even if we use AI to help us create formal
+proofs, we still need to understand the underlying concepts and
+principles. Hence, while the use of AI in this module, especially as a
+tutor, is encouraged, we advise against using AI to do your coursework
+for you --- if you do, you won't learn anything. It is a bit like
+taking a forklift to the gym to lift weights.
+
+![Taking a forklift to the gym](diagrams/fork-lift.png)
+*Using AI to do your coursework is like taking a forklift to the gym: the weights get lifted, but your muscles stay small.*

@@ -292,7 +292,7 @@ corresponds to time travel:
 
   "There was a magician who could time travel who wanted to marry the
   daughter of a king. There was no gold in the country but people were
-  not sure wether diamonds exist. Hence the king set the magician the
+  not sure whether diamonds exist. Hence the king set the magician the
   task to either find a diamond or to produce a way to turn diamonds
   into gold. The magician went for the 2nd option and gave the king an
   empty box so he could marry the daughter. However, if the king would
@@ -325,7 +325,7 @@ The philosophical argument goes like this: while facts about the real
 world are true or false even if we don't know them this isn't so
 obvious about mathematical constructions which take place in our
 head. The set of all numbers doesn't exist in the real world it is
-like a story we share and we don't know wether anything we make up is
+like a story we share and we don't know whether anything we make up is
 either true or false. However, we can talk about evidence without
 needing to assume that.
 
@@ -371,7 +371,7 @@ and once which do not. In my logic poker I ask you to prove
 propositions intuitionistically where possible and only use classical
 reasoning where necessary.
 
-Now a common question is how to see wether a proposition is only
+Now a common question is how to see whether a proposition is only
 provable classically. E.g. why can we prove all the first de Morgan
 law and one direction of the 2nd but not `¬ (P ∧ Q) → ¬ P ∨ ¬ Q`?
 The reason is that the right hand side contains some information,

@@ -143,7 +143,7 @@ example : (∀ x : A, PP x)
   apply pq
   apply p
 ```
-Note that after `intro` the proof state is::
+Note that after `intro` the proof state is:
 
   p : ∀ (x : A), PP x,
   pq : ∀ (y : A), PP y → QQ y,
@@ -188,8 +188,8 @@ example : (∀ x : A, PP x ∧ QQ x)
     apply hp
     apply hq
 ```
-I am using `have` which we have already seen in ... After `intro a` I am in the
-following state (ignoring the parts not relevant now)::
+I am using `have` which we have already seen in the chapter on Propositional Logic. After `intro a` I am in the
+following state (ignoring the parts not relevant now):
 ```
   h : ∀ (x : A), PP x ∧ QQ x,
   a : A
@@ -243,7 +243,7 @@ example :
     apply pa
 ```
 
-After the `intro` we are in the following state::
+After the `intro` we are in the following state:
 ```
   p : ∃ (x : A), PP x,
   pq : ∀ (y : A), PP y → QQ y
@@ -325,7 +325,7 @@ example :
     apply pq
     assumption
 ```
-After `constructor` we are in the following state (ignoring the assumptions inroduced by `variable`):
+After `constructor` we are in the following state (ignoring the assumptions introduced by `variable`):
 ```
 case intro.h
 pq : ∀ (y : A), PP y → QQ y
@@ -338,16 +338,16 @@ a : A
 pa : PP a
 ⊢ A
 ```
-Indeed we have two goals: the 2nd one is finding the witness an element of `A` which is displayed as `⊢ A` and the first one is to show that `QQ` holds for that witness which is `QQ ?intro.w` where `?intro.w` refers to the other yet incomplete goal. Instead of finding a witness first (as with `exists`) we just try to prove `QQ ?intro.w` and hope that the other goal gets instantiated automtically. Which is what happens because after `apply pq` we see
+Indeed we have two goals: the 2nd one is finding the witness, an element of `A`, which is displayed as `⊢ A` and the first one is to show that `QQ` holds for that witness which is `QQ ?intro.w` where `?intro.w` refers to the other yet incomplete goal. Instead of finding a witness first (as with `exists`) we just try to prove `QQ ?intro.w` and hope that the other goal gets instantiated automatically. Which is what happens because after `apply pq` we see
 ```
 pq : ∀ (y : A), PP y → QQ y
 a : A
 pa : PP a
 ⊢ PP ?intro.w
 ```
-and once we prove this using `assumption` lean will use `pa` nd hence knows that `?intro.w` nust be `a`. So this goal gets discharged utomatically.
+and once we prove this using `assumption` lean will use `pa` and hence knows that `?intro.w` must be `a`. So this goal gets discharged automatically.
 
-This is clearly better because it saves us ti have to construct the witness manually. However, some care is in place when using `constructor`. We may try to postpone the `cases` until the end
+This is clearly better because it saves us the need to construct the witness manually. However, some care is in place when using `constructor`. We may try to postpone the `cases` until the end
 ```
 example (A : Type) (PP QQ : A → Prop) :
     (∃ x : A, PP x) →
@@ -372,11 +372,11 @@ but `assumption` fails because the weird looking `PP (?m.27 ⋯)` cannot be inst
 # Another Currying equivalence
 
 You may have noticed that the way we prove propositions involving `→`
-and `∀` is very similar. In both cases wem use `intro` to prove
+and `∀` is very similar. In both cases we use `intro` to prove
 them by introducing an assumption in the first case a proposition and
-in the secnde an element in a type and in both cases we use them using
-`apply` to prove the current goal. Similarily `∧` and `∃` behave
-similar: we need to supply two components. And in both cases we are using `cases` with
+in the second an element in a type and in both cases we use them using
+`apply` to prove the current goal. Similarly `∧` and `∃` behave
+similarly: we need to supply two components. And in both cases we are using `cases` with
 two components which basically replaces the assumption by its two
 components.
 
@@ -390,7 +390,7 @@ predicate logic has the form
 
 `(∃ x : A, QQ x) → R  ↔ (∀ x : A , QQ x → R)`
 
-ths time we turn an existential into a universal quantifier. For the
+this time we turn an existential into a universal quantifier. For the
 intuition, we use `QQ x` to mean `x` *is clever* and `R` means *the
 professor is happy*.  Hence the equivalence is:
 
@@ -457,7 +457,7 @@ theorem symEq : ∀ x y : A, x = y → y = x := by
   intro x y p
   rw [p]
 ```
-After the `intro` the goal is::
+After the `intro` the goal is:
 
 ```
 x y : A,
@@ -559,7 +559,7 @@ theorem dm1_pred {A : Type} {PP : A → Prop} :
         apply pa
 ```
 
-This direction does not require classical logic.
+Neither direction of this law requires classical logic.
 
 ## Second de Morgan law (needs classical logic)
 

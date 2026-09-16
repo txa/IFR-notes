@@ -163,7 +163,7 @@ How does `run` work:
 - in the other cases we dispatch on the first instruction:
   - if it is `pushC` or `pushV` we push the appropriate value on the stack.
   - if it is `add` or `mult` we assume that the arguments are on the top of the stack (note the order), pop them and replace them by the result.
-- there are a number of error conditions, which we should signal explicitly (using `Option` or a more specific error type) but we play still quick and dirty and return `0`.
+- there are a number of error conditions, which we should signal explicitly (using `Option` or a more specific error type) but we still play quick and dirty and return `0`.
 
 Here is the first version of the compiler:
 ```anchor compile1
@@ -190,7 +190,7 @@ theorem compile_ok :
   eval e env = run (compile e) [] env := by sorry
 ```
 
-However, we will first reimplement the compiler using *continuation passing style* which is both more efficient and easier to verify because we avoid using `++` by passing the rest of the code (the continuation) as an argument. The idea is basically the same as for `fastrev`. It is easier to verify because since we avoid `++` we don't have to refer to the monoid laws of `List`. Here is the continuation passing version of the compiler which uses an auxiliary function:
+However, we will first reimplement the compiler using *continuation passing style* which is both more efficient and easier to verify because we avoid using `++` by passing the rest of the code (the continuation) as an argument. The idea is basically the same as for `fastrev`. It is easier to verify because we avoid `++` and so we don't have to refer to the monoid laws of `List`. Here is the continuation passing version of the compiler which uses an auxiliary function:
 ```anchor compile_aux
 def compile_aux : Expr → Code → Code
 | const n , c => pushC n :: c
@@ -245,7 +245,7 @@ induction e with
       := by rfl
       _ = run c (eval (times l r) env :: s) env := by rfl
 ```
-The interesting bit is the use of tree induction. It is important to not introduce the quantifiers for `c` and `s` to early because they are changing during the proof. Note also the presence of two induction hypotheses for the binary constructors.
+The interesting bit is the use of tree induction. It is important to not introduce the quantifiers for `c` and `s` too early because they are changing during the proof. Note also the presence of two induction hypotheses for the binary constructors.
 
 Using this lemma compiler correctness is now very straightforward:
 ```anchor compile_ok

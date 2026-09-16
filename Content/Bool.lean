@@ -69,14 +69,14 @@ theorem noConfBool : true ≠ false := by
 intro q
 cases q
 ```
-We use the fact that `true ≠ false` is defined as `¬ (true = false)` and hence `true = false → False`. Hence after `intro q` we are in the following stata:
+We use the fact that `true ≠ false` is defined as `¬ (true = false)` and hence `true = false → False`. Hence after `intro q` we are in the following state:
 ```
 q : true = false
 ⊢ False
 ```
 Now there is no way to prove `False` but we can ask Lean to analyze our assumption `q` and it knows that this is impossible.
 
-You may think that we are cheating here  bit because basically Lean already knows that there is no proof of `true = false`. Indeed we can actually prove `true ≠ false` from first principles using only `rewrite` and a function `Bool → Prop` (see next section for functions on `Bool`). And this is the way it is done in the Lean library.
+You may think that we are cheating here a bit because basically Lean already knows that there is no proof of `true = false`. Indeed we can actually prove `true ≠ false` from first principles using only `rewrite` and a function `Bool → Prop` (see next section for functions on `Bool`). And this is the way it is done in the Lean library.
 
 # Functions on Bool
 
@@ -160,7 +160,7 @@ These functions produce the same truth tables as the ones we defined before,
 but their *computational behaviour* is different, which becomes important
 when proving properties about them.
 
-# Proving equations about bool
+# Proving equations about Bool
 
 Next, let's prove some interesting equalities. We are going to revisit our old
 friend, *distributivity* — but this time for booleans:
@@ -180,7 +180,7 @@ x y z : Bool
 ⊢ (x && (y || z)) = (x && y || x && z)
 ```
 
-We do case analysis on `x`, which can be either `tt` or `ff`. Hence, after `cases x`, we are left with two subgoals:
+We do case analysis on `x`, which can be either `true` or `false`. Hence, after `cases x`, we are left with two subgoals:
 
 ```
 case false
@@ -232,15 +232,15 @@ example : ∀ x y z : Bool,
 After `cases z`, we are stuck in the following state:
 
 ```
-x y : bool
-⊢ x && (y || ff) = x && y || x && ff
+x y : Bool
+⊢ x && (y || false) = x && y || x && false
 ```
 
 No reduction is possible because we defined the functions by matching
 on the first argument. Using `cases y` would have done a bit of
 reduction but not enough. `cases x` was the right choice.
 
-Now have a go at proving the *De Morgan* laws for `bool` yourself.
+Now have a go at proving the *De Morgan* laws for `Bool` yourself.
 Both are provable just using case analysis:
 
 ```anchor dm1_b
@@ -251,18 +251,18 @@ theorem dm1_b : ∀ b c : Bool,
 theorem dm2_b : ∀ b c : Bool,
    (! (b && c)) = (!b || ! c) := by
 ```
-# Relating bool and Prop
+# Relating Bool and Prop
 
 It may not have escaped your notice that we seem to define logical
 operations twice: once for `Prop` and once for `Bool`. How are the two
-related? We now define a function that maps `Bool` to the corrresponding `Prop`
+related? We now define a function that maps `Bool` to the corresponding `Prop`
 ```anchor isTrue
 def isTrue : Bool → Prop
 | b => b = true
 ```
-`isTrue true` evaluates to `true = true` which is equivalent to `True` while `isTrue false` evluates to `false = true` which is equivalent to `false`.
+`isTrue true` evaluates to `true = true` which is equivalent to `True` while `isTrue false` evaluates to `false = true` which is equivalent to `False`.
 
-Using `isTrue` we can express the correctness of `&&` wrt `∧` : namely `isTue (b && c)` is equivalent to `isTrue b ∧ isTrue c`:
+Using `isTrue` we can express the correctness of `&&` wrt `∧` : namely `isTrue (b && c)` is equivalent to `isTrue b ∧ isTrue c`:
 ```anchor and_ok
 theorem and_ok : ∀ b c : Bool,
   isTrue (b && c) ↔ isTrue b ∧ isTrue c := by
@@ -284,7 +284,7 @@ constructor
     dsimp [and]
     assumption
 ```
-I am using `dsimp ... at ...` which simplfies a definition. Actually the proof also works without the `dsimp`s.
+I am using `dsimp ... at ...` which simplifies a definition. Actually the proof also works without the `dsimp`s.
 
 The proof from left to right explores the truth table via case analysis while the proof from right to left uses equational reasoning. I recommend stepping through this proof interactively. We are only
 using tactics already explained. Note that `cases` is used in two
@@ -305,7 +305,7 @@ theorem not_ok : ∀ b : Bool, isTrue (! b) ↔ ¬ isTrue b := by
 
 Previously we proved `true ≠ false` by doing cases on `true = false` and lean knows that this is impossible. However, we can actually prove this without this kind of magic and behind the curtains this is how the proof is actually implemented.
 
-First of all we define an alternative version of `isTrue` but this tie by pattern matching:
+First of all we define an alternative version of `isTrue` but this time by pattern matching:
 ```anchor isTrueD
 def isTrueD : Bool → Prop
 | true => True

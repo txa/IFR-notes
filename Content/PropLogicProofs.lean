@@ -53,12 +53,12 @@ theorem comAnd : P ∧ Q → Q ∧ P := by
     exact p
 -- ANCHOR_END: ExampleComAnd
 
--- ANCHOR: ExampleComAndIfalse
-theorem comAndIfalse : P ∧ Q ↔ Q ∧ P := by
+-- ANCHOR: ExampleComAndIff
+theorem comAndIff : P ∧ Q ↔ Q ∧ P := by
   constructor
   apply comAnd
   apply comAnd
--- ANCHOR_END: ExampleComAndIfalse
+-- ANCHOR_END: ExampleComAndIff
 
 -- ANCHOR: ExampleCurry
 theorem curry : P ∧ Q → R ↔ P → Q → R := by
@@ -100,10 +100,10 @@ theorem caseLem : (P → R) → (Q → R) → P ∨ Q → R := by
     exact q
 -- ANCHOR_END: ExampleCaseLem
 
---ANCHOR: ExampleDistr
+-- ANCHOR: ExampleDistr
 example : P ∧ (Q ∨ R) ↔ (P ∧ Q) ∨ (P ∧ R) := by
   sorry
---ANCHOR_END: ExampleDistr
+-- ANCHOR_END: ExampleDistr
 
 -- ANCHOR: ExampleTrue
 example : True := by

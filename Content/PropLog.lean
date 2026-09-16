@@ -76,7 +76,7 @@ Tautologies are sort of useless in everyday conversations because they contain n
 
 # Our first proof
 
-In Lean we write `p : P` for `p` proves the proposition `P`. For our purposes a proof is a sequence of *tactics* afalseecting the current proof state (the assumptions we have made and the current goal). In Lean 4, a tactic proof starts with `by`, and tactics go on separate lines (no commas).
+In Lean we write `p : P` for `p` proves the proposition `P`. For our purposes a proof is a sequence of *tactics* affecting the current proof state (the assumptions we have made and the current goal). In Lean 4, a tactic proof starts with `by`, and tactics go on separate lines (no commas).
 
 We start with a very simple tautology `P → P`: If `P` then `P`. We can illustrate this with the statement *if the sun shines then the sun shines*. Clearly, this sentence contains no information about the weather; it is vacuously true—indeed, a tautology.
 
@@ -287,7 +287,7 @@ pq : P ∧ Q
 ⊢ Q ∧ P
 ```
 
-Assuming `P ∧ Q` is the same as assuming both `P` and `Q`. This is facilitated via the `cases` tactic which matches how a conjuction was created (and we learn the the *constructor* for `∧` is called `intro`). Hence after
+Assuming `P ∧ Q` is the same as assuming both `P` and `Q`. This is facilitated via the `cases` tactic which matches how a conjunction was created (and we learn the *constructor* for `∧` is called `intro`). Hence after
 ```
 cases pq with
   | intro p q =>
@@ -305,8 +305,8 @@ I hope you notice the same symmetry between tactics for *how to prove* and *how 
 
 It is good to know that Lean always abstracts the propositional variables we have declared. We can actually use `comAnd` with different instantiation to prove the following:
 
-```anchor ExampleComAndIfalse
-theorem comAndIfalse : P ∧ Q ↔ Q ∧ P := by
+```anchor ExampleComAndIff
+theorem comAndIff : P ∧ Q ↔ Q ∧ P := by
   constructor
   apply comAnd
   apply comAnd

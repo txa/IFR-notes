@@ -13,11 +13,11 @@ set_option verso.exampleModule "Content.ListProofs"
 If you have already used a functional programming language like
 Haskell you know that lists are a very ubiquitous datastructure. Given
 `A : Type` there is `List A : Type` which is the type of
-finite sequences of elements of `A`. So for example `[1,2,3] : list
+finite sequences of elements of `A`. So for example `[1,2,3] : List
 ℕ` or `[true] : List Bool`, we can also have lists of lists so for
 example `[[],[0],[0,1],[0,1,2]] : List (List ℕ)` is a list of lists
 of numbers. However, all elements of a list must have the same type,
-hence something like `[1,tt]` is not permitted.
+hence something like `[1,true]` is not permitted.
 
 For any type `A` we always can construct the empty list `[] : List
 A`, which is also called `nil` (this comes from the phrase *not in
@@ -194,7 +194,7 @@ The switch between left and right neutrality is a consequence of that we
 have defined `+` by recursion over the 2nd argument while we have
 defined `++` by recursion over the first. We could have defined
 `+` by recursion over the first argument and then this difference
-would have disappeared (I prefer this but the designers of the lean
+would have disappeared (I prefer this but the designers of the Lean
 standard library had different ideas). We couldn't have defined `++`
 by recursion over the 2nd argument - do you see why?
 
@@ -354,7 +354,7 @@ To keep things simple I will only sort lists of natural numbers with respect to
 `≤ : ℕ → ℕ → Prop` using the fact that we have an implementation in
 the form of `le_ℕ : ℕ → ℕ → Bool` which decides `≤`.
 
-So our goal is to implement a function `sort : list ℕ → list ℕ` that
+So our goal is to implement a function `sort : List ℕ → List ℕ` that
 sorts a given list, e.g. `sort [6,3,8,2,3] = [2, 3, 3, 6, 8]`.
 
 Insertion sort can be easily done with a deck of cards: you start with
@@ -409,7 +409,7 @@ inductive Mem : A → List A → Prop
 ```
 We write `a ∈ as` for `Mem a as`.
 
-The first constructor `mem_hd` (a rule without premises this is often called an axiom) tells us that an element is a member of list that starts with it, e.g. `2 ∈ [2,3]`. The 2nd constructor `mem_tl` tells s that if we know that an element appears in the tail of a list then it also appears in the cons, eg. using `2 ∈ [2,3]` we can show `2 ∈ [1,2,3]`.
+The first constructor `mem_hd` (a rule without premises this is often called an axiom) tells us that an element is a member of a list that starts with it, e.g. `2 ∈ [2,3]`. The 2nd constructor `mem_tl` tells us that if we know that an element appears in the tail of a list then it also appears in the cons, eg. using `2 ∈ [2,3]` we can show `2 ∈ [1,2,3]`.
 ```anchor x2in123
 example : 2 ∈ [1,2,3] := by
   apply mem_tl
@@ -492,11 +492,11 @@ example : Sorted [1,2,3] := by
 ```
 I am using
 ```
-LE2le : ∀ m n : ℕ, m ≤ n → le_ℕ m n
+le2LE : ∀ m n : ℕ, le_ℕ m n → m ≤ n
 ```
 to establish facts like `1 ≤ 3`. Indeed Lean defines a tactic `decide` which uses decidability to derive proofs. However, this doesn't work for our homegrown definitions.
 
-Yes this is a rather laborious proof for such a trivial fact. Nobody would do this by hand and indeed it isn't hard to see that `Sorted` is decidable. But in the end we don't want to decided wether something is sorted but we actually want to sort!
+Yes this is a rather laborious proof for such a trivial fact. Nobody would do this by hand and indeed it isn't hard to see that `Sorted` is decidable. But in the end we don't want to decide whether something is sorted but we actually want to sort!
 
 ## Verifying insertion sort
 
@@ -577,7 +577,7 @@ example : Insert 2 [1,3] [1,2,3] := by
   apply ins_hd
 ```
 
-We now define `Perm` using `Insert`, basically the permutation of a fixed list can be obtained by inserting each element ast an arbitrary position:
+We now define `Perm` using `Insert`, basically the permutation of a fixed list can be obtained by inserting each element at an arbitrary position:
 
 ```anchor Perm
 inductive Perm : List A → List A → Prop

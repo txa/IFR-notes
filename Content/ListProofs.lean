@@ -81,9 +81,9 @@ rfl
 
 -- can we do this for hd ?
 
+-- ANCHOR: hd
 namespace hd
 
--- ANCHOR: hd
 def hd : List A → A
 | [] => sorry
 | a :: as => a
